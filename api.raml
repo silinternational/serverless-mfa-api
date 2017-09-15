@@ -25,6 +25,10 @@ types:
           email:
             type: string
             required: true
+        example: |
+          {
+            "email": "john_smith@example.com"
+          }
     responses:
       204:
       401:
@@ -44,6 +48,11 @@ types:
           api_key:
             type: string
             required: true
+        example: |
+          {
+            "email": "john_smith@example.com",
+            "api_key": "ABCDEFGHIJKLMNOPQRSTUVWXYZ+abcdefgh/ijklmno="
+          }
     responses:
       200:
         body:
@@ -51,6 +60,10 @@ types:
             properties:
               api_secret:
                 type: string
+            example: |
+              {
+                "api_secret": "..."
+              }
       401:
       404:
 
