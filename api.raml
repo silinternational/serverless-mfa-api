@@ -1,0 +1,79 @@
+#%RAML 1.0
+title: TOTP API
+version: v1
+baseUri: http://api.samplehost.com
+types:
+  TestType:
+    type: object
+    properties:
+      id: number
+      optional?: string
+      expanded:
+        type: object
+        properties:
+          count: number
+/totp:
+  post:
+    headers:
+      X-TOTP-ApiKey:
+        description: API Key
+        required: true
+      X-TOTP-ApiSecret:
+        description: API Secret
+        required: true
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "id": "28123f10-e33d-5533-b53f-111ef8d7b14f",
+                "key": "28123f10-e33d-5533-b53f-111ef8d7b14f",
+                "image_url": "data:image/gif;base64,..."
+              }
+      401:
+
+/totp/{id}:
+  uriParameters:
+    id:
+      description: TOTP ID
+      type: string
+      required: true
+  delete:
+    headers:
+      X-TOTP-ApiKey:
+        description: API Key
+        required: true
+      X-TOTP-ApiSecret:
+        description: API Secret
+        required: true
+    responses:
+      204:
+      401:
+      404:
+
+/totp/{id}/validate:
+  uriParameters:
+    id:
+      description: TOTP ID
+      type: string
+      required: true
+  post:
+    headers:
+      X-TOTP-ApiKey:
+        description: API Key
+        required: true
+      X-TOTP-ApiSecret:
+        description: API Secret
+        required: true
+    body:
+      application/json:
+        properties:
+          code:
+            type: string
+        example: |
+          {"code": "012345"}
+    responses:
+      204:
+      401:
+      404:
