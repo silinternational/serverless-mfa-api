@@ -12,6 +12,42 @@ types:
         type: object
         properties:
           count: number
+
+/key:
+  description: Register for a new API Key/Secret. This endpoint will send an email with the ApiKey. You must then make another call to /register/activate with the email address and api_key to get an api_secret. Protect your api_key as a secret.
+  post:
+    body:
+      application/json:
+        properties:
+          email:
+            type: string
+            required: true
+    responses:
+      204:
+      401:
+
+/key/activate:
+  description: Activate an account using the api_key received in an email. Returns api_secret needed for further calls. This call can only be made once per api_key, so make sure you save the secret somewhere safe.
+  post:
+    body:
+      application/json:
+        properties:
+          email:
+            type: string
+            required: true
+          api_key:
+            type: string
+            required: true
+    responses:
+      200:
+        body:
+          application/json:
+            properties:
+              api_secret:
+                type: string
+      401:
+      404:
+
 /totp:
   post:
     headers:
