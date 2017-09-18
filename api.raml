@@ -14,7 +14,7 @@ types:
         properties:
           count: number
 
-/key:
+/api-key:
   description: |
     Register for a new API Key/Secret. This endpoint will send an email with the
     ApiKey. You must then make another call to /key/activate with the email
@@ -34,7 +34,7 @@ types:
       204:
       401:
 
-/key/activate:
+/api-key/activate:
   description: |
     Activate an account using the api_key received in an email. Returns
     api_secret needed for further calls. This call can only be made once per
