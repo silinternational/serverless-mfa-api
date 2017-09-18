@@ -46,24 +46,24 @@ types:
           email:
             type: string
             required: true
-          api_key:
+          apiKey:
             type: string
             required: true
         example: |
           {
             "email": "john_smith@example.com",
-            "api_key": "0123456789abcdef0123456789abcdef01234567"
+            "apiKey": "0123456789abcdef0123456789abcdef01234567"
           }
     responses:
       200:
         body:
           application/json:
             properties:
-              api_secret:
+              apiSecret:
                 type: string
             example: |
               {
-                "api_secret": "ABCDEFGHIJKLMNOPQRSTUVWXYZ+abcdefgh/ijklmno="
+                "apiSecret": "ABCDEFGHIJKLMNOPQRSTUVWXYZ+abcdefgh/ijklmno="
               }
       401:
       404:
