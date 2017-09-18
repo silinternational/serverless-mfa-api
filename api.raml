@@ -87,16 +87,16 @@ types:
           application/json:
             example: |
               {
-                "id": "aaaaaaaa-1111-aaaa-1111-aaaaaaaaaaaa",
+                "uuid": "aaaaaaaa-1111-aaaa-1111-aaaaaaaaaaaa",
                 "key": "aaaa bbbb cccc dddd 1111 2222 3333 4444",
                 "image_url": "data:image/gif;base64,..."
               }
       401:
 
-/totp/{id}:
+/totp/{uuid}:
   uriParameters:
-    id:
-      description: TOTP ID
+    uuid:
+      description: The TOTP account's UUID.
       type: string
       required: true
   delete:
@@ -112,10 +112,10 @@ types:
       401:
       404:
 
-/totp/{id}/validate:
+/totp/{uuid}/validate:
   uriParameters:
-    id:
-      description: TOTP ID
+    uuid:
+      description: TOTP UUID
       type: string
       required: true
   post:
