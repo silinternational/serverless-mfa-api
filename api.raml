@@ -16,9 +16,9 @@ types:
 
 /api-key:
   description: |
-    Register for a new API Key/Secret. This endpoint will send an email with the
-    ApiKey. You must then make another call to /key/activate with the email
-    address and api_key to get an api_secret. Protect your api_key as a secret.
+    Create a new API Key for this API. This endpoint will send an email with a
+    new, unique API Key. You must then make a separate call to activate that API
+    Key. Protect your API Key as a secret.
   post:
     body:
       application/json:
@@ -36,9 +36,9 @@ types:
 
 /api-key/activate:
   description: |
-    Activate an account using the api_key received in an email. Returns
-    api_secret needed for further calls. This call can only be made once per
-    api_key, so make sure you save the secret somewhere safe.
+    Activate a recently-created API Key. Returns the API Secret needed for
+    further calls. This call can only be made once per API Key, so make sure you
+    save the API Secret somewhere safe.
   post:
     body:
       application/json:
@@ -69,6 +69,10 @@ types:
       404:
 
 /totp:
+  description: |
+    Create a new TOTP account. This will return a UUID for that account, along
+    with a TOTP key and barcode for the end-user to type in or scan in order to
+    add an account to their TOTP-compatible smartphone app.
   post:
     headers:
       X-TOTP-ApiKey:
