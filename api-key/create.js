@@ -5,9 +5,9 @@ const crypto = require('crypto');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const response = require ('../helpers/response.js');
 
-module.exports.create = (event, context, callback) => {
+const create = (requestBody, callback) => {
   const timestamp = new Date().getTime();
-  const data = JSON.parse(event.body);
+  const data = JSON.parse(requestBody);
   
   if ((!data.email) || typeof data.email !== 'string') {
     response.returnError(400, 'Email is required', callback);
@@ -34,4 +34,8 @@ module.exports.create = (event, context, callback) => {
     response.returnSuccess(result.Item, callback);
     return;
   });
+};
+
+module.exports.handler = (event, context, callback) => {
+  create(event.body, callback);
 };

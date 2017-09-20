@@ -25,7 +25,7 @@ custom:
 
 functions:
   apiKeyCreate:
-    handler: api-key/create.create
+    handler: api-key/create.handler
     name: ${self:custom.namespace}_apiKeyCreate
     environment:
       TABLE_NAME: ${self:custom.apiKeyTable}
