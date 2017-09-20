@@ -22,6 +22,12 @@ protocols: [HTTPS]
           }
     responses:
       204:
+        description: |
+          The API Key was successfully created, and an email will be sent to the
+          given email address with the API Key's value.
+      400:
+        description: |
+          The request was unacceptable for some reason. See the error message.
       401:
 
 /api-key/activate:
