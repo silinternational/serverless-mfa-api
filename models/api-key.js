@@ -10,7 +10,7 @@ module.exports.create = (requestBody, callback) => {
   const data = JSON.parse(requestBody);
   
   if ((!data.email) || typeof data.email !== 'string') {
-    response.returnError(400, 'Email is required', callback);
+    response.returnError(400, 'email is required', callback);
     return;
   }
   
