@@ -42,7 +42,7 @@ module.exports.activate = (requestBody, callback) => {
     
     const apiSecret = crypto.randomBytes(32).toString('base64');
     apiKeyRecord.apiSecret = apiSecret;
-    updateApiKeyRecord(apiKeyRecord, (error, updatedRecord) => {
+    updateApiKeyRecord(apiKeyRecord, (error) => {
       if (error) {
         console.error(error);
         response.returnError(500, 'Error while activating API Key.', callback);
@@ -120,14 +120,14 @@ const updateApiKeyRecord = (apiKeyRecord, callback) => {
     Item: apiKeyRecord
   };
   
-  dynamoDb.put(params, (error, result) => {
+  dynamoDb.put(params, (error) => {
     if (error) {
       console.error(error);
       callback(new Error('Failed to update API Key record.'));
       return;
     }
     
-    callback(null, result.Item);
+    callback(null);
     return;
   });
 };
