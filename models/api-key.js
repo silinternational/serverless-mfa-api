@@ -14,6 +14,8 @@ module.exports.create = (requestBody, callback) => {
     return;
   }
   
+  /* @todo Validate that it seems to be an actual email address. */
+  
   const apiKeyValue = crypto.randomBytes(20).toString('hex');
   const params = {
     TableName: process.env.TABLE_NAME,
