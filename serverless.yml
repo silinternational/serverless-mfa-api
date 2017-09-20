@@ -1,0 +1,54 @@
+service: totp-api
+
+frameworkVersion: ">=1.21.0 <2.0.0"
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  memorySize: 512
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:us-east-1:*:*"
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  namespace: ${self:service}_${self:custom.stage}
+  apiKeyTable: ${self:custom.namespace}_api-key
+
+functions:
+  apiKeyCreate:
+    handler: api-key/create.create
+    name: ${self:custom.namespace}_apiKeyCreate
+    environment:
+      TABLE_NAME: ${self:custom.apiKeyTable}
+    events:
+      - http:
+          path: api-key
+          method: post
+
+resources:
+  Resources:
+    ApiKeyDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: value
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: value
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: '${self:custom.apiKeyTable}'
