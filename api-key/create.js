@@ -31,7 +31,7 @@ const create = (requestBody, callback) => {
       return;
     }
     
-    response.returnSuccess(result.Item, callback);
+    response.returnSuccess(null, callback);
     return;
   });
 };
