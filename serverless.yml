@@ -24,6 +24,15 @@ custom:
   apiKeyTable: ${self:custom.namespace}_api-key
 
 functions:
+  apiKeyActivate:
+    handler: api-key/activate.handler
+    name: ${self:custom.namespace}_apiKeyActivate
+    environment:
+      TABLE_NAME: ${self:custom.apiKeyTable}
+    events:
+      - http:
+          path: api-key/activate
+          method: post
   apiKeyCreate:
     handler: api-key/create.handler
     name: ${self:custom.namespace}_apiKeyCreate
