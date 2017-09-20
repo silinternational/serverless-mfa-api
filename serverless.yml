@@ -42,6 +42,15 @@ functions:
       - http:
           path: api-key
           method: post
+  totpCreate:
+    handler: totp/create.handler
+    name: ${self:custom.namespace}_totpCreate
+    environment:
+      TABLE_NAME: ${self:custom.apiKeyTable}
+    events:
+      - http:
+          path: totp
+          method: post
 
 resources:
   Resources:
