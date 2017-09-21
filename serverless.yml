@@ -25,7 +25,7 @@ custom:
 
 functions:
   apiKeyActivate:
-    handler: api-key/activate.handler
+    handler: handlers/api-key.activate
     name: ${self:custom.namespace}_apiKeyActivate
     environment:
       TABLE_NAME: ${self:custom.apiKeyTable}
@@ -34,7 +34,7 @@ functions:
           path: api-key/activate
           method: post
   apiKeyCreate:
-    handler: api-key/create.handler
+    handler: handlers/api-key.create
     name: ${self:custom.namespace}_apiKeyCreate
     environment:
       TABLE_NAME: ${self:custom.apiKeyTable}
@@ -43,7 +43,7 @@ functions:
           path: api-key
           method: post
   totpCreate:
-    handler: totp/create.handler
+    handler: handlers/totp.create
     name: ${self:custom.namespace}_totpCreate
     environment:
       TABLE_NAME: ${self:custom.apiKeyTable}
