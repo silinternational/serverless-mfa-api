@@ -125,6 +125,12 @@ module.exports.validate = (pathParameters, requestHeaders, requestBody, callback
     }
     
     const encryptedTotpKey = apiKeyRecord.totp[totpUuid].encryptedTotpKey;
+    if (!encryptedTotpKey) {
+      console.error('No encryptedTotpKey found in that TOTP record.');
+      response.returnError(500, 'Error validating TOTP code.', callback);
+      return;
+    }
+    
     encryption.decrypt(encryptedTotpKey, requestApiSecret, (error, totpKey) => {
       if (error) {
         console.error(error);
