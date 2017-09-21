@@ -118,6 +118,12 @@ module.exports.validate = (pathParameters, requestHeaders, requestBody, callback
       return;
     }
     
+    if (!apiKeyRecord.totp[totpUuid]) {
+      console.log('API Key has no such TOTP uuid.');
+      response.returnError(401, 'Unauthorized', callback);
+      return;
+    }
+    
     const encryptedTotpKey = apiKeyRecord.totp[totpUuid].encryptedTotpKey;
     encryption.decrypt(encryptedTotpKey, requestApiSecret, (error, totpKey) => {
       if (error) {
