@@ -22,3 +22,15 @@ Simple standalone API for creating and validating TOTP codes
 
 For details about the various API endpoints, see
 [the RAML file](https://github.com/silinternational/totp-api/blob/master/api.raml).
+
+## Glossary
+
+- `API Key`: A hex string used to identify calls to most of the endpoints on
+  this API. We store a copy of this in the database.
+- `API Secret`: A base-64 encoded random value used to encrypt/decrypt the
+  consumer's TOTP Key(s). We do **NOT** store a copy of this (currently... see
+  [Issue #3](https://github.com/silinternational/totp-api/issues/3)).
+- `TOTP Key`: The secret used for generating TOTP values. This is provided to
+  the consumer of this API for them to show as a string / QR Code to their end
+  user. We store an encrypted copy of this (encrypted using the API Secret) so
+  that when we need to verify given 6-digit code, we can do so.
