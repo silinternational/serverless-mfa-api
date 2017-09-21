@@ -14,7 +14,7 @@ module.exports.decrypt = (ivAndEncryptedDataBase64, aesKeyBase64, callback) => {
   const inputPieces = ivAndEncryptedDataBase64.split(':');
   if (inputPieces.length !== 2) {
     console.error(
-      'Expected a single color (:) delimiter, between the IV and the ' +
+      'Expected a single colon (:) delimiter, between the IV and the ' +
       'encrypted data. Found %s.',
       inputPieces.length
     );
