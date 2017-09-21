@@ -31,6 +31,12 @@ module.exports.create = (requestHeaders, callback) => {
       return;
     }
     
+    if (!apiKeyRecord) {
+      console.log('No such API Key found:', requestApiKeyValue);
+      response.returnError(401, 'Unauthorized', callback);
+      return;
+    }
+    
     const otpSecrets = speakeasy.generateSecret();
     qrCode.toDataURL(otpSecrets.otpauth_url, function(error, dataUrl) {
       if (error) {
