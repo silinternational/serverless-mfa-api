@@ -3,6 +3,7 @@
   "description": "Simple standalone API for creating and validating TOTP codes",
   "dependencies": {
     "aws-sdk": "^2.110.0",
+    "crypto-js": "^3.1.9-1",
     "qrcode": "^0.9.0",
     "speakeasy": "^2.0.0",
     "uuid": "^3.1.0"
