@@ -37,6 +37,12 @@ module.exports.create = (requestHeaders, callback) => {
       return;
     }
     
+    if (!apiKey.isAlreadyActivated(apiKeyRecord)) {
+      console.log('API Key has not yet been activated.');
+      response.returnError(401, 'Unauthorized', callback);
+      return;
+    }
+    
     const otpSecrets = speakeasy.generateSecret();
     qrCode.toDataURL(otpSecrets.otpauth_url, function(error, dataUrl) {
       if (error) {
