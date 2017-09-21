@@ -41,7 +41,7 @@ module.exports.activate = (requestBody, callback) => {
     }
     
     const apiSecret = crypto.randomBytes(32).toString('base64');
-    apiKeyRecord.apiSecret = apiSecret;
+    apiKeyRecord.activated = new Date().getTime();
     updateApiKeyRecord(apiKeyRecord, (error) => {
       if (error) {
         console.error(error);
@@ -112,7 +112,7 @@ const getApiKeyByValue = (value, callback) => {
 module.exports.getApiKeyByValue = getApiKeyByValue;
 
 const isAlreadyActivated = (apiKeyRecord) => {
-  return Boolean(apiKeyRecord && apiKeyRecord.apiSecret);
+  return Boolean(apiKeyRecord && apiKeyRecord.activated);
 };
 
 const updateApiKeyRecord = (apiKeyRecord, callback) => {
