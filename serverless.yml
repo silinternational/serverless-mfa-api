@@ -51,6 +51,15 @@ functions:
       - http:
           path: totp
           method: post
+  totpValidate:
+    handler: handlers/totp.validate
+    name: ${self:custom.namespace}_totpValidate
+    environment:
+      TABLE_NAME: ${self:custom.apiKeyTable}
+    events:
+      - http:
+          path: totp/{uuid}/validate
+          method: post
 
 resources:
   Resources:

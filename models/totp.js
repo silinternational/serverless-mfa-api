@@ -73,3 +73,75 @@ module.exports.create = (requestHeaders, callback) => {
     });
   });
 };
+
+module.exports.validate = (pathParameters, requestHeaders, requestBody, callback) => {
+  
+  const requestApiKeyValue = requestHeaders['x-totp-apikey'];
+  if (!requestApiKeyValue) {
+    console.log('TOTP validate request had no API Key.');
+    response.returnError(401, 'Unauthorized', callback);
+    return;
+  }
+
+  const requestApiSecret = requestHeaders['x-totp-apisecret'];
+  if (!requestApiSecret) {
+    console.log('TOTP validate request had no API Secret.');
+    response.returnError(401, 'Unauthorized', callback);
+    return;
+  }
+  
+  const totpUuid = pathParameters.uuid;
+  if ((!totpUuid) || typeof totpUuid !== 'string') {
+    console.log('TOTP validate request had no UUID string in the URL.');
+    response.returnError(401, 'Unauthorized', callback);
+    return;
+  }
+  
+  /* @TODO Make sure we were given a JSON body. */
+  
+  const data = JSON.parse(requestBody);
+  if ((!data.code) || typeof data.code !== 'string') {
+    response.returnError(400, 'code (as a string) is required', callback);
+    return;
+  }
+  
+  apiKey.getApiKeyByValue(requestApiKeyValue, (error, apiKeyRecord) => {
+    if (error) {
+      console.error('Failed to retrieve API Key.', error);
+      response.returnError(500, 'Error validating TOTP code.', callback);
+      return;
+    }
+    
+    if (!apiKeyRecord) {
+      console.log('No such API Key found:', requestApiKeyValue);
+      response.returnError(401, 'Unauthorized', callback);
+      return;
+    }
+    
+    const encryptedTotpKey = apiKeyRecord.totp[totpUuid].encryptedTotpKey;
+    encryption.decrypt(encryptedTotpKey, requestApiSecret, (error, totpKey) => {
+      if (error) {
+        console.error(error);
+        response.returnError(500, 'Error validating TOTP code.', callback);
+        return;
+      }
+      
+      const isValid = speakeasy.totp.verify({
+        secret: totpKey,
+        encoding: 'base32',
+        token: data.code,
+        window: 1 // 1 means compare against previous, current, and next.
+      });
+      
+      if (!isValid) {
+        console.log('Invalid TOTP code.');
+        response.returnError(401, 'Invalid', callback);
+        return;
+      }
+      
+      console.log('Valid TOTP code.');
+      response.returnSuccess({'message': 'Valid', 'status': 200}, callback);
+      return;
+    });
+  });
+};
