@@ -57,6 +57,9 @@ module.exports.activate = (requestBody, callback) => {
 
 module.exports.create = (requestBody, callback) => {
   const timestamp = new Date().getTime();
+  
+  /* @TODO Make sure we were given a JSON body. */
+  
   const data = JSON.parse(requestBody);
   
   if ((!data.email) || typeof data.email !== 'string') {
