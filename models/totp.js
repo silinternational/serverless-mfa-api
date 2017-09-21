@@ -1,7 +1,7 @@
 'use strict';
 
 const apiKey = require('../models/api-key.js');
-const crypto = require('crypto');
+const encryption = require('../helpers/encryption.js');
 const qrCode = require('qrcode');
 const response = require('../helpers/response.js');
 const speakeasy = require('speakeasy');
@@ -47,7 +47,7 @@ module.exports.create = (requestHeaders, callback) => {
         totpUuid = uuid.v4();
       }
       apiKeyRecord.totp[totpUuid] = {
-        //'encryptedTotpKey': crypto... @todo Encrypt and save the TOTP key.
+        'encryptedTotpKey': encryption.encrypt(totpKey, requestApiSecret)
       };
       apiKey.updateApiKeyRecord(apiKeyRecord, (error) => {
         if (error) {
