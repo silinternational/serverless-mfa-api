@@ -5,6 +5,12 @@ frameworkVersion: ">=1.21.0 <2.0.0"
 provider:
   name: aws
   runtime: nodejs6.10
+  
+  # Experimented with various memory sizes. Manually calling the totpValidate
+  # function once every few seconds, the average durations were as follows:
+  #   512 MB = 48 ms
+  #   256 MB = 71 ms
+  #   128 MB = 159 ms
   memorySize: 512
   iamRoleStatements:
     - Effect: "Allow"
