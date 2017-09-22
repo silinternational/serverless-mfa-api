@@ -23,6 +23,21 @@ Simple standalone API for creating and validating TOTP codes
 For details about the various API endpoints, see
 [the RAML file](https://github.com/silinternational/totp-api/blob/master/api.raml).
 
+## Continuous Integration / Continuous Deployment (CI/CD)
+
+To set this up on Codeship, do the following:
+
+- Create a Codeship Basic project.
+- Give it a Setup Command of `./codeship/setup.sh`
+- Give it a Test Command of `./codeship/test.sh`
+- Create a Deployment Pipeline for the `develop` branch with this command:
+  `./codeship/deploy-dev.sh`
+- Create a Deployment Pipeline for the `master` branch with this command:
+  `./codeship/deploy-prod.sh`
+- Provide `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables
+  with the credentials of the AWS IAM user that Serverless (running on Codeship)
+  should act as when deploying this API.
+
 ## Glossary
 
 - `API Key`: A hex string used to identify calls to most of the endpoints on
