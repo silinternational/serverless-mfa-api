@@ -7,7 +7,7 @@ const response = require('../helpers/response.js');
 const speakeasy = require('speakeasy');
 const uuid = require('uuid');
 
-module.exports.create = (requestHeaders, callback) => {
+module.exports.create = (requestHeaders, requestBody, callback) => {
   
   // NOTE: AWS lowercases these custom header names before handing them to us.
   const requestApiKeyValue = requestHeaders['x-totp-apikey'];
@@ -23,6 +23,10 @@ module.exports.create = (requestHeaders, callback) => {
     response.returnError(401, 'Unauthorized', callback);
     return;
   }
+  
+  /* @TODO Make sure we were given a JSON body. */
+  
+  const options = JSON.parse(requestBody);
   
   apiKey.getApiKeyByValue(requestApiKeyValue, (error, apiKeyRecord) => {
     if (error) {
@@ -44,7 +48,15 @@ module.exports.create = (requestHeaders, callback) => {
     }
     
     const otpSecrets = speakeasy.generateSecret();
-    qrCode.toDataURL(otpSecrets.otpauth_url, function(error, dataUrl) {
+    let otpAuthUrlOptions = { 'secret': otpSecrets.base32 };
+    if (typeof options.issuer === 'string') {
+      otpAuthUrlOptions.issuer = options.issuer;
+    }
+    if (typeof options.label === 'string') {
+      otpAuthUrlOptions.label = options.label;
+    }
+    const otpAuthUrl = speakeasy.otpauthURL(otpAuthUrlOptions);
+    qrCode.toDataURL(otpAuthUrl, function(error, dataUrl) {
       if (error) {
         console.error(error);
         response.returnError(500, 'Failed to generate QR code.', callback);
