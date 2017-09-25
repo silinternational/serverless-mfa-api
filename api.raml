@@ -22,6 +22,12 @@ protocols: [HTTPS]
           }
     responses:
       204:
+        description: |
+          The API Key was successfully created, and an email will be sent to the
+          given email address with the API Key's value.
+      400:
+        description: |
+          The request was unacceptable for some reason. See the error message.
       401:
 
 /api-key/activate:
@@ -57,6 +63,8 @@ protocols: [HTTPS]
               }
       401:
       404:
+        description: |
+          No such API key was found with that email address.
 
 /totp:
   description: |
@@ -78,8 +86,8 @@ protocols: [HTTPS]
             example: |
               {
                 "uuid": "aaaaaaaa-1111-aaaa-1111-aaaaaaaaaaaa",
-                "totp-key": "aaaa bbbb cccc dddd 1111 2222 3333 4444",
-                "image_url": "data:image/gif;base64,..."
+                "totpKey": "aaaa bbbb cccc dddd 1111 2222 3333 4444",
+                "imageUrl": "data:image/gif;base64,..."
               }
       401:
 
@@ -125,5 +133,8 @@ protocols: [HTTPS]
           {"code": "012345"}
     responses:
       204:
+      400:
+        description: |
+          The request body was invlalid, such as if no `code` value was found.
       401:
       404:
