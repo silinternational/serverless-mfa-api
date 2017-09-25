@@ -47,14 +47,18 @@ module.exports.create = (requestHeaders, requestBody, callback) => {
       return;
     }
     
+    const issuer = (typeof options.issuer === 'string') ? options.issuer : null;
+    const label = (typeof options.label === 'string') ? options.label : null;
     const otpSecrets = speakeasy.generateSecret();
-    let otpAuthUrlOptions = { 'secret': otpSecrets.base32 };
-    if (typeof options.issuer === 'string') {
-      otpAuthUrlOptions.issuer = options.issuer;
+    let otpAuthUrlOptions = {
+      'label': label || 'SecretKey',
+      'secret': otpSecrets.base32
+    };
+    if (issuer) {
+      otpAuthUrlOptions.issuer = issuer;
+      otpAuthUrlOptions.label = issuer + ':' + otpAuthUrlOptions.label;
     }
-    if (typeof options.label === 'string') {
-      otpAuthUrlOptions.label = options.label;
-    }
+    
     const otpAuthUrl = speakeasy.otpauthURL(otpAuthUrlOptions);
     qrCode.toDataURL(otpAuthUrl, function(error, dataUrl) {
       if (error) {
