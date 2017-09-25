@@ -79,6 +79,25 @@ protocols: [HTTPS]
       X-TOTP-ApiSecret:
         description: API Secret
         required: true
+    body:
+      application/json:
+        properties:
+          issuer:
+            description: |
+              The name of the service/website for which the user is setting up
+              this TOTP account.
+            type: string
+            required: false
+          label:
+            description: |
+              A name for the user's account (such as their username).
+            type: string
+            required: false
+        example: |
+          {
+            "issuer": "Acme",
+            "label": "john_smith@example.com"
+          }
     responses:
       200:
         body:
