@@ -17,5 +17,8 @@ module.exports.create = (event, context, callback) => {
 };
 
 module.exports.validate = (event, context, callback) => {
-  totp.validate(event.pathParameters, event.headers, event.body, callback);
+  const {apikey = '', apisecret = ''} = requestHelper.getTotpHeaders(event.headers);
+  const {uuid = ''} = event.pathParameters;
+  const {code = ''} = requestHelper.getJsonData(event.body);
+  totp.validate(apikey, apisecret, uuid, code, callback);
 };
