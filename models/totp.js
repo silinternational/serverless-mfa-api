@@ -7,28 +7,20 @@ const response = require('../helpers/response.js');
 const speakeasy = require('speakeasy');
 const uuid = require('uuid');
 
-module.exports.create = (requestHeaders, requestBody, callback) => {
-  
-  // NOTE: AWS lowercases these custom header names before handing them to us.
-  const requestApiKeyValue = requestHeaders['x-totp-apikey'];
-  if (!requestApiKeyValue) {
+module.exports.create = (apiKey, apiSecret, options = {}, callback) => {
+  if (!apiKey) {
     console.log('TOTP create request had no API Key.');
     response.returnError(401, 'Unauthorized', callback);
     return;
   }
   
-  const requestApiSecret = requestHeaders['x-totp-apisecret'];
-  if (!requestApiSecret) {
+  if (!apiSecret) {
     console.log('TOTP create request had no API Secret.');
     response.returnError(401, 'Unauthorized', callback);
     return;
   }
   
-  /* @TODO Make sure we were given a JSON body. */
-  
-  const options = JSON.parse(requestBody);
-  
-  apiKey.getApiKeyByValue(requestApiKeyValue, (error, apiKeyRecord) => {
+  apiKey.getApiKeyByValue(apiKey, (error, apiKeyRecord) => {
     if (error) {
       console.error(error);
       response.returnError(500, 'Failed to retrieve API Key.', callback);
@@ -36,7 +28,7 @@ module.exports.create = (requestHeaders, requestBody, callback) => {
     }
     
     if (!apiKeyRecord) {
-      console.log('No such API Key found:', requestApiKeyValue);
+      console.log('No such API Key found:', apiKey);
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
@@ -75,7 +67,7 @@ module.exports.create = (requestHeaders, requestBody, callback) => {
         totpUuid = uuid.v4();
       }
       apiKeyRecord.totp[totpUuid] = {
-        'encryptedTotpKey': encryption.encrypt(totpKey, requestApiSecret)
+        'encryptedTotpKey': encryption.encrypt(totpKey, apiSecret)
       };
       apiKey.updateApiKeyRecord(apiKeyRecord, (error) => {
         if (error) {
