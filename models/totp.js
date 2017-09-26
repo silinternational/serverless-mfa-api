@@ -7,7 +7,7 @@ const response = require('../helpers/response.js');
 const speakeasy = require('speakeasy');
 const uuid = require('uuid');
 
-module.exports.create = (apiKey, apiSecret, options = {}, callback) => {
+module.exports.create = (apiKey, apiSecret, {issuer, label = 'SecretKey'} = {}, callback) => {
   if (!apiKey) {
     console.log('TOTP create request had no API Key.');
     response.returnError(401, 'Unauthorized', callback);
@@ -39,16 +39,14 @@ module.exports.create = (apiKey, apiSecret, options = {}, callback) => {
       return;
     }
     
-    const issuer = (typeof options.issuer === 'string') ? options.issuer : null;
-    const label = (typeof options.label === 'string') ? options.label : null;
     const otpSecrets = speakeasy.generateSecret();
     let otpAuthUrlOptions = {
-      'label': label || 'SecretKey',
+      'label': label,
       'secret': otpSecrets.base32
     };
     if (issuer) {
       otpAuthUrlOptions.issuer = issuer;
-      otpAuthUrlOptions.label = issuer + ':' + otpAuthUrlOptions.label;
+      otpAuthUrlOptions.label = issuer + ':' + label;
     }
     
     const otpAuthUrl = speakeasy.otpauthURL(otpAuthUrlOptions);
