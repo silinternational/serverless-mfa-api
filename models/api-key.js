@@ -55,14 +55,10 @@ module.exports.activate = (requestBody, callback) => {
   });
 };
 
-module.exports.create = (requestBody, callback) => {
+module.exports.create = (email, callback) => {
   const timestamp = new Date().getTime();
   
-  /* @TODO Make sure we were given a JSON body. */
-  
-  const data = JSON.parse(requestBody);
-  
-  if ((!data.email) || typeof data.email !== 'string') {
+  if ((!email) || typeof email !== 'string') {
     response.returnError(400, 'email is required', callback);
     return;
   }
@@ -74,7 +70,7 @@ module.exports.create = (requestBody, callback) => {
     TableName: process.env.TABLE_NAME,
     Item: {
       createdAt: timestamp,
-      email: data.email,
+      email: email,
       value: apiKeyValue
     }
   };
