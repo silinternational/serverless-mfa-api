@@ -7,8 +7,8 @@ const response = require('../helpers/response.js');
 const speakeasy = require('speakeasy');
 const uuid = require('uuid');
 
-module.exports.create = (apiKey, apiSecret, {issuer, label = 'SecretKey'} = {}, callback) => {
-  if (!apiKey) {
+module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} = {}, callback) => {
+  if (!apiKeyValue) {
     console.log('TOTP create request had no API Key.');
     response.returnError(401, 'Unauthorized', callback);
     return;
@@ -20,7 +20,7 @@ module.exports.create = (apiKey, apiSecret, {issuer, label = 'SecretKey'} = {}, 
     return;
   }
   
-  apiKey.getApiKeyByValue(apiKey, (error, apiKeyRecord) => {
+  apiKey.getApiKeyByValue(apiKeyValue, (error, apiKeyRecord) => {
     if (error) {
       console.error(error);
       response.returnError(500, 'Failed to retrieve API Key.', callback);
@@ -28,7 +28,7 @@ module.exports.create = (apiKey, apiSecret, {issuer, label = 'SecretKey'} = {}, 
     }
     
     if (!apiKeyRecord) {
-      console.log('No such API Key found:', apiKey);
+      console.log('No such API Key found:', apiKeyValue);
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
