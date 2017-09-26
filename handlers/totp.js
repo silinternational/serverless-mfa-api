@@ -9,6 +9,12 @@ module.exports.create = (event, context, callback) => {
   totp.create(apikey, apisecret, options, callback);
 };
 
+module.exports.delete = (event, context, callback) => {
+  const {apikey = '', apisecret = ''} = requestHelper.getTotpHeaders(event.headers);
+  const {uuid = ''} = event.pathParameters;
+  totp.delete(apikey, apisecret, uuid, callback);
+};
+
 module.exports.validate = (event, context, callback) => {
   const {apikey = '', apisecret = ''} = requestHelper.getTotpHeaders(event.headers);
   const {uuid = ''} = event.pathParameters;

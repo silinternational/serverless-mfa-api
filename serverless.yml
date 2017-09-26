@@ -57,6 +57,15 @@ functions:
       - http:
           path: totp
           method: post
+  totpDelete:
+    handler: handlers/totp.delete
+    name: ${self:custom.namespace}_totpDelete
+    environment:
+      TABLE_NAME: ${self:custom.apiKeyTable}
+    events:
+      - http:
+          path: totp/{uuid}
+          method: delete
   totpValidate:
     handler: handlers/totp.validate
     name: ${self:custom.namespace}_totpValidate
