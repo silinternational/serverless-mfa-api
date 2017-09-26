@@ -12,7 +12,7 @@ const totp = require('../models/totp.js');
  
 module.exports.create = (event, context, callback) => {
   const {apikey = '', apisecret = ''} = requestHelper.getTotpHeaders(event.headers);
-  const options = requestHelper.getJsonData(event.body);
+  const options = requestHelper.getJsonData(event.body || undefined);
   totp.create(apikey, apisecret, options, callback);
 };
 
