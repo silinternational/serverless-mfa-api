@@ -1,4 +1,4 @@
-module.exports.getTotpHeaders = (headers = {}, callback) => {
+module.exports.getTotpHeaders = (headers = {}) => {
   let totpHeaders = {};
   for (name in headers) {
     let lowercaseName = name.toLowerCase();
@@ -6,10 +6,9 @@ module.exports.getTotpHeaders = (headers = {}, callback) => {
       totpHeaders[lowercaseName.substr(7)] = headers[name];
     }
   }
-  callback(null, totpHeaders);
+  return totpHeaders;
 };
 
-module.exports.getJsonData = (jsonString = '{}', callback) => {
-  const data = JSON.parse(jsonString);
-  callback(null, data);
+module.exports.getJsonData = (jsonString = '{}') => {
+  return JSON.parse(jsonString);
 };
