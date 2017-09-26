@@ -7,28 +7,20 @@ const response = require('../helpers/response.js');
 const speakeasy = require('speakeasy');
 const uuid = require('uuid');
 
-module.exports.create = (requestHeaders, requestBody, callback) => {
-  
-  // NOTE: AWS lowercases these custom header names before handing them to us.
-  const requestApiKeyValue = requestHeaders['x-totp-apikey'];
-  if (!requestApiKeyValue) {
+module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} = {}, callback) => {
+  if (!apiKeyValue) {
     console.log('TOTP create request had no API Key.');
     response.returnError(401, 'Unauthorized', callback);
     return;
   }
   
-  const requestApiSecret = requestHeaders['x-totp-apisecret'];
-  if (!requestApiSecret) {
+  if (!apiSecret) {
     console.log('TOTP create request had no API Secret.');
     response.returnError(401, 'Unauthorized', callback);
     return;
   }
   
-  /* @TODO Make sure we were given a JSON body. */
-  
-  const options = JSON.parse(requestBody);
-  
-  apiKey.getApiKeyByValue(requestApiKeyValue, (error, apiKeyRecord) => {
+  apiKey.getApiKeyByValue(apiKeyValue, (error, apiKeyRecord) => {
     if (error) {
       console.error(error);
       response.returnError(500, 'Failed to retrieve API Key.', callback);
@@ -36,7 +28,7 @@ module.exports.create = (requestHeaders, requestBody, callback) => {
     }
     
     if (!apiKeyRecord) {
-      console.log('No such API Key found:', requestApiKeyValue);
+      console.log('No such API Key found:', apiKeyValue);
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
@@ -47,16 +39,14 @@ module.exports.create = (requestHeaders, requestBody, callback) => {
       return;
     }
     
-    const issuer = (typeof options.issuer === 'string') ? options.issuer : null;
-    const label = (typeof options.label === 'string') ? options.label : null;
     const otpSecrets = speakeasy.generateSecret();
     let otpAuthUrlOptions = {
-      'label': label || 'SecretKey',
+      'label': label,
       'secret': otpSecrets.base32
     };
     if (issuer) {
       otpAuthUrlOptions.issuer = issuer;
-      otpAuthUrlOptions.label = issuer + ':' + otpAuthUrlOptions.label;
+      otpAuthUrlOptions.label = issuer + ':' + label;
     }
     
     const otpAuthUrl = speakeasy.otpauthURL(otpAuthUrlOptions);
@@ -75,7 +65,7 @@ module.exports.create = (requestHeaders, requestBody, callback) => {
         totpUuid = uuid.v4();
       }
       apiKeyRecord.totp[totpUuid] = {
-        'encryptedTotpKey': encryption.encrypt(totpKey, requestApiSecret)
+        'encryptedTotpKey': encryption.encrypt(totpKey, apiSecret)
       };
       apiKey.updateApiKeyRecord(apiKeyRecord, (error) => {
         if (error) {
@@ -96,38 +86,32 @@ module.exports.create = (requestHeaders, requestBody, callback) => {
   });
 };
 
-module.exports.validate = (pathParameters, requestHeaders, requestBody, callback) => {
+module.exports.validate = (apiKeyValue, apiSecret, totpUuid, code, callback) => {
   
-  const requestApiKeyValue = requestHeaders['x-totp-apikey'];
-  if (!requestApiKeyValue) {
+  if (!apiKeyValue) {
     console.log('TOTP validate request had no API Key.');
     response.returnError(401, 'Unauthorized', callback);
     return;
   }
 
-  const requestApiSecret = requestHeaders['x-totp-apisecret'];
-  if (!requestApiSecret) {
+  if (!apiSecret) {
     console.log('TOTP validate request had no API Secret.');
     response.returnError(401, 'Unauthorized', callback);
     return;
   }
   
-  const totpUuid = pathParameters.uuid;
-  if ((!totpUuid) || typeof totpUuid !== 'string') {
+  if (!totpUuid) {
     console.log('TOTP validate request had no UUID string in the URL.');
     response.returnError(401, 'Unauthorized', callback);
     return;
   }
   
-  /* @TODO Make sure we were given a JSON body. */
-  
-  const data = JSON.parse(requestBody);
-  if ((!data.code) || typeof data.code !== 'string') {
+  if (!code) {
     response.returnError(400, 'code (as a string) is required', callback);
     return;
   }
   
-  apiKey.getApiKeyByValue(requestApiKeyValue, (error, apiKeyRecord) => {
+  apiKey.getApiKeyByValue(apiKeyValue, (error, apiKeyRecord) => {
     if (error) {
       console.error('Failed to retrieve API Key.', error);
       response.returnError(500, 'Error validating TOTP code.', callback);
@@ -135,7 +119,7 @@ module.exports.validate = (pathParameters, requestHeaders, requestBody, callback
     }
     
     if (!apiKeyRecord) {
-      console.log('No such API Key found:', requestApiKeyValue);
+      console.log('No such API Key found:', apiKeyValue);
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
@@ -159,7 +143,7 @@ module.exports.validate = (pathParameters, requestHeaders, requestBody, callback
       return;
     }
     
-    encryption.decrypt(encryptedTotpKey, requestApiSecret, (error, totpKey) => {
+    encryption.decrypt(encryptedTotpKey, apiSecret, (error, totpKey) => {
       if (error) {
         console.error(error);
         response.returnError(500, 'Error validating TOTP code.', callback);
@@ -169,7 +153,7 @@ module.exports.validate = (pathParameters, requestHeaders, requestBody, callback
       const isValid = speakeasy.totp.verify({
         secret: totpKey,
         encoding: 'base32',
-        token: data.code,
+        token: code,
         window: 1 // 1 means compare against previous, current, and next.
       });
       

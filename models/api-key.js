@@ -5,20 +5,19 @@ const crypto = require('crypto');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const response = require ('../helpers/response.js');
 
-module.exports.activate = (requestBody, callback) => {
-  const data = JSON.parse(requestBody);
+module.exports.activate = (apiKeyValue, email, callback) => {
   
-  if ((!data.email) || typeof data.email !== 'string') {
+  if ((!email) || typeof email !== 'string') {
     response.returnError(400, 'email is required', callback);
     return;
   }
   
-  if ((!data.apiKey) || typeof data.apiKey !== 'string') {
+  if ((!apiKeyValue) || typeof apiKeyValue !== 'string') {
     response.returnError(400, 'apiKey is required', callback);
     return;
   }
   
-  getApiKeyByValue(data.apiKey, (error, apiKeyRecord) => {
+  getApiKeyByValue(apiKeyValue, (error, apiKeyRecord) => {
     if (error) {
       console.error(error);
       response.returnError(500, 'Failed to retrieve API Key.', callback);
@@ -26,7 +25,7 @@ module.exports.activate = (requestBody, callback) => {
     }
     
     const noSuchApiKeyRecord = (apiKeyRecord == undefined);
-    if (noSuchApiKeyRecord || (apiKeyRecord.email !== data.email)) {
+    if (noSuchApiKeyRecord || (apiKeyRecord.email !== email)) {
       response.returnError(404, 'No matching API Key record was found', callback);
       return;
     }
@@ -34,7 +33,7 @@ module.exports.activate = (requestBody, callback) => {
     if (isAlreadyActivated(apiKeyRecord)) {
       console.log(
         'Attempt to re-activate API Key %s...',
-        data.apiKey.substr(0, data.apiKey.length / 2)
+        apiKeyValue.substr(0, apiKeyValue.length / 2)
       );
       response.returnError(401, 'Unauthorized', callback);
       return;
@@ -55,14 +54,10 @@ module.exports.activate = (requestBody, callback) => {
   });
 };
 
-module.exports.create = (requestBody, callback) => {
+module.exports.create = (email, callback) => {
   const timestamp = new Date().getTime();
   
-  /* @TODO Make sure we were given a JSON body. */
-  
-  const data = JSON.parse(requestBody);
-  
-  if ((!data.email) || typeof data.email !== 'string') {
+  if ((!email) || typeof email !== 'string') {
     response.returnError(400, 'email is required', callback);
     return;
   }
@@ -74,7 +69,7 @@ module.exports.create = (requestBody, callback) => {
     TableName: process.env.TABLE_NAME,
     Item: {
       createdAt: timestamp,
-      email: data.email,
+      email: email,
       value: apiKeyValue
     }
   };
