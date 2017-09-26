@@ -77,6 +77,7 @@ module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} =
         const apiResponse = {
           'uuid': totpUuid,
           'totpKey': totpKey,
+          'otpAuthUrl': otpAuthUrl,
           'imageUrl': dataUrl
         };
         response.returnSuccess(apiResponse, callback);
