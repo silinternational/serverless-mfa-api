@@ -11,8 +11,8 @@ const totp = require('../models/totp.js');
  */
  
 module.exports.create = (event, context, callback) => {
-  let {apikey = '', apisecret = ''} = requestHelper.getTotpHeaders(event.headers);
-  let options = requestHelper.getJsonData(event.body);
+  const {apikey = '', apisecret = ''} = requestHelper.getTotpHeaders(event.headers);
+  const options = requestHelper.getJsonData(event.body);
   totp.create(apikey, apisecret, options, callback);
 };
 
