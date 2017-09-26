@@ -42,7 +42,8 @@ module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} =
     const otpSecrets = speakeasy.generateSecret();
     let otpAuthUrlOptions = {
       'label': label,
-      'secret': otpSecrets.base32
+      'secret': otpSecrets.base32,
+      'encoding': 'base32'
     };
     if (issuer) {
       otpAuthUrlOptions.issuer = issuer;
