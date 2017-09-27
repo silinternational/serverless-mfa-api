@@ -29,6 +29,32 @@ module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} =
     
     if (!apiKeyRecord) {
       console.log('No such API Key found:', apiKeyValue);
+      
+      /* Perform a password hash so that the timing is similar to when there is
+       * an API Key with that value.  */
+      password.hash('dummy text');
+      
+      response.returnError(401, 'Unauthorized', callback);
+      return;
+    }
+    
+    if (!apiKeyRecord.hashedApiSecret) {
+      console.log('That API Key record (%s...) has no hashed API Secret', apiKeyValue);
+      
+      /* Perform a password hash so that the timing is similar to when there is
+       * an API Key with that value.  */
+      password.hash('dummy text');
+      
+      response.returnError(401, 'Unauthorized', callback);
+      return;
+    }
+    
+    const isValidApiSecret = password.compare(apiSecret, apiKeyRecord.hashedApiSecret);
+    if (isValidApiSecret !== true) {
+      console.log(
+        'DANGER! A valid API Key value was provided (%s...), but an invalid API Secret came with it.',
+        apiKeyValue.substr(0, apiKeyValue.length / 2)
+      );
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
