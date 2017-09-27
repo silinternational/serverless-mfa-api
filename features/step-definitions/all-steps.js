@@ -8,13 +8,11 @@ defineSupportCode(function({Given, When, Then}) {
   let aesKeyBase64;
   let apiSecret;
   let apiSecret2;
+  let decryptedMessage;
   let encryptedMessage;
   let hashedApiSecret;
   let hashedApiSecretCheck;
   let plainTextMessage;
-  
-  /** @var result The result of the single When step called in a scenario. */
-  let result;
   
   Given('I have a 2nd API Secret that is different', function () {
     apiSecret2 = crypto.randomBytes(32).toString('base64');
@@ -54,23 +52,23 @@ defineSupportCode(function({Given, When, Then}) {
   });
   
   When('I decrypt the encrypted message', function (callback) {
-    encryption.decrypt(encryptedMessage, aesKeyBase64, (error, decryptedMessage) => {
-      result = decryptedMessage;
+    encryption.decrypt(encryptedMessage, aesKeyBase64, (error, decryptionResult) => {
+      decryptedMessage = decryptionResult;
       callback();
     });
   });
   
   When('I decrypt the encrypted message using a wrong AES key', function (callback) {
     const wrongAesKeyBase64 = crypto.randomBytes(32).toString('base64');
-    encryption.decrypt(encryptedMessage, wrongAesKeyBase64, (error, decryptedMessage) => {
-      result = decryptedMessage;
+    encryption.decrypt(encryptedMessage, wrongAesKeyBase64, (error, decryptionResult) => {
+      decryptedMessage = decryptionResult;
       callback();
     });
   });
   
   When('I encrypt a plain text message', function () {
     plainTextMessage = 'The test message';
-    result = encryption.encrypt(plainTextMessage, aesKeyBase64);
+    encryptedMessage = encryption.encrypt(plainTextMessage, aesKeyBase64);
   });
   
   Then('the hashed API Secret check should have passed', function () {
@@ -89,15 +87,19 @@ defineSupportCode(function({Given, When, Then}) {
     assert.notEqual(hashedApiSecret, apiSecret);
   });
   
-  Then('the result should match the plain text message', function () {
-    assert.strictEqual(result, plainTextMessage);
-  });
-
-  Then('the result should NOT be empty', function () {
-    assert(result != undefined, 'The result seemed empty');
+  Then('the decrypted message should match the plain text message', function () {
+    assert.strictEqual(decryptedMessage, plainTextMessage);
   });
   
-  Then('the result should NOT match the plain text message', function () {
-    assert.notEqual(result, plainTextMessage);
+  Then('the encrypted message should NOT be empty', function () {
+    assert(encryptedMessage != undefined);
+  });
+  
+  Then('the decrypted message should NOT match the plain text message', function () {
+    assert.notEqual(decryptedMessage, plainTextMessage);
+  });
+  
+  Then('the encrypted message should NOT match the plain text message', function () {
+    assert.notEqual(encryptedMessage, plainTextMessage);
   });
 });
