@@ -3,6 +3,7 @@
 const AWS = require('aws-sdk');
 const crypto = require('crypto');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
+const password = require('../helpers/password.js');
 const response = require ('../helpers/response.js');
 
 module.exports.activate = (apiKeyValue, email, callback) => {
@@ -41,6 +42,7 @@ module.exports.activate = (apiKeyValue, email, callback) => {
     
     const apiSecret = crypto.randomBytes(32).toString('base64');
     apiKeyRecord.activatedAt = new Date().getTime();
+    apiKeyRecord.hashedApiSecret = password.hash(apiSecret);
     updateApiKeyRecord(apiKeyRecord, (error) => {
       if (error) {
         console.error('Error while activating API Key.', error);
