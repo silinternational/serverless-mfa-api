@@ -71,6 +71,22 @@ defineSupportCode(function({Given, When, Then}) {
     encryptedMessage = encryption.encrypt(plainTextMessage, aesKeyBase64);
   });
   
+  Then('the decrypted message should match the plain text message', function () {
+    assert.strictEqual(decryptedMessage, plainTextMessage);
+  });
+  
+  Then('the decrypted message should NOT match the plain text message', function () {
+    assert.notEqual(decryptedMessage, plainTextMessage);
+  });
+  
+  Then('the encrypted message should NOT be empty', function () {
+    assert(encryptedMessage != undefined);
+  });
+  
+  Then('the encrypted message should NOT match the plain text message', function () {
+    assert.notEqual(encryptedMessage, plainTextMessage);
+  });
+  
   Then('the hashed API Secret check should have passed', function () {
     assert.strictEqual(hashedApiSecretCheck, true);
   });
@@ -85,21 +101,5 @@ defineSupportCode(function({Given, When, Then}) {
   
   Then('the hashed API Secret should NOT match the API Secret', function () {
     assert.notEqual(hashedApiSecret, apiSecret);
-  });
-  
-  Then('the decrypted message should match the plain text message', function () {
-    assert.strictEqual(decryptedMessage, plainTextMessage);
-  });
-  
-  Then('the encrypted message should NOT be empty', function () {
-    assert(encryptedMessage != undefined);
-  });
-  
-  Then('the decrypted message should NOT match the plain text message', function () {
-    assert.notEqual(decryptedMessage, plainTextMessage);
-  });
-  
-  Then('the encrypted message should NOT match the plain text message', function () {
-    assert.notEqual(encryptedMessage, plainTextMessage);
   });
 });
