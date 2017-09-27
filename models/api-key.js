@@ -19,8 +19,8 @@ module.exports.activate = (apiKeyValue, email, callback) => {
   
   getApiKeyByValue(apiKeyValue, (error, apiKeyRecord) => {
     if (error) {
-      console.error(error);
-      response.returnError(500, 'Failed to retrieve API Key.', callback);
+      console.error('Failed to retrieve API Key.', error);
+      response.returnError(500, 'Internal Server Error', callback);
       return;
     }
     
@@ -43,8 +43,8 @@ module.exports.activate = (apiKeyValue, email, callback) => {
     apiKeyRecord.activatedAt = new Date().getTime();
     updateApiKeyRecord(apiKeyRecord, (error) => {
       if (error) {
-        console.error(error);
-        response.returnError(500, 'Error while activating API Key.', callback);
+        console.error('Error while activating API Key.', error);
+        response.returnError(500, 'Internal Server Error', callback);
         return;
       }
       
@@ -76,8 +76,8 @@ module.exports.create = (email, callback) => {
   
   dynamoDb.put(params, (error, result) => {
     if (error) {
-      console.error(error);
-      response.returnError(500, 'Failed to save new API Key.', callback);
+      console.error('Failed to save new API Key.', error);
+      response.returnError(500, 'Internal Server Error', callback);
       return;
     }
     

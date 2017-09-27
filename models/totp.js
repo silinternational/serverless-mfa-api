@@ -23,7 +23,7 @@ module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} =
   apiKey.getApiKeyByValue(apiKeyValue, (error, apiKeyRecord) => {
     if (error) {
       console.error(error);
-      response.returnError(500, 'Failed to retrieve API Key.', callback);
+      response.returnError(500, 'Internal Server Error', callback);
       return;
     }
     
@@ -53,8 +53,8 @@ module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} =
     const otpAuthUrl = speakeasy.otpauthURL(otpAuthUrlOptions);
     qrCode.toDataURL(otpAuthUrl, function(error, dataUrl) {
       if (error) {
-        console.error(error);
-        response.returnError(500, 'Failed to generate QR code.', callback);
+        console.error('Failed to generate QR code.', error);
+        response.returnError(500, 'Internal Server Error', callback);
         return;
       }
       
@@ -70,8 +70,8 @@ module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} =
       };
       apiKey.updateApiKeyRecord(apiKeyRecord, (error) => {
         if (error) {
-          console.error(error);
-          response.returnError(500, 'Failed to create new TOTP entry.', callback);
+          console.error('Failed to create new TOTP entry.', error);
+          response.returnError(500, 'Internal Server Error', callback);
           return;
         }
         
@@ -84,6 +84,66 @@ module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} =
         response.returnSuccess(apiResponse, callback);
         return;
       });
+    });
+  });
+};
+
+module.exports.delete = (apiKeyValue, apiSecret, totpUuid, callback) => {
+  
+  if (!apiKeyValue) {
+    console.log('TOTP delete request had no API Key.');
+    response.returnError(401, 'Unauthorized', callback);
+    return;
+  }
+
+  if (!apiSecret) {
+    console.log('TOTP delete request had no API Secret.');
+    response.returnError(401, 'Unauthorized', callback);
+    return;
+  }
+  
+  if (!totpUuid) {
+    console.log('TOTP delete request had no UUID.');
+    response.returnError(401, 'Unauthorized', callback);
+    return;
+  }
+  
+  apiKey.getApiKeyByValue(apiKeyValue, (error, apiKeyRecord) => {
+    if (error) {
+      console.error('Failed to retrieve API Key.', error);
+      response.returnError(500, 'Internal Server Error', callback);
+      return;
+    }
+    
+    if (!apiKeyRecord) {
+      console.log('No such API Key found:', apiKeyValue);
+      response.returnError(401, 'Unauthorized', callback);
+      return;
+    }
+    
+    if (!apiKey.isAlreadyActivated(apiKeyRecord)) {
+      console.log('API Key has not yet been activated.');
+      response.returnError(401, 'Unauthorized', callback);
+      return;
+    }
+    
+    if (!apiKeyRecord.totp || !apiKeyRecord.totp[totpUuid]) {
+      console.log('API Key has no such TOTP uuid.');
+      response.returnError(404, 'No TOTP entry found with that uuid for that API Key.', callback);
+      return;
+    }
+    
+    delete apiKeyRecord.totp[totpUuid];
+    
+    apiKey.updateApiKeyRecord(apiKeyRecord, (error) => {
+      if (error) {
+        console.error('Error while deleting TOTP entry.', error);
+        response.returnError(500, 'Internal Server Error', callback);
+        return;
+      }
+      
+      response.returnSuccess(null, callback);
+      return;
     });
   });
 };
@@ -103,7 +163,7 @@ module.exports.validate = (apiKeyValue, apiSecret, totpUuid, code, callback) => 
   }
   
   if (!totpUuid) {
-    console.log('TOTP validate request had no UUID string in the URL.');
+    console.log('TOTP validate request had no UUID.');
     response.returnError(401, 'Unauthorized', callback);
     return;
   }
@@ -116,7 +176,7 @@ module.exports.validate = (apiKeyValue, apiSecret, totpUuid, code, callback) => 
   apiKey.getApiKeyByValue(apiKeyValue, (error, apiKeyRecord) => {
     if (error) {
       console.error('Failed to retrieve API Key.', error);
-      response.returnError(500, 'Error validating TOTP code.', callback);
+      response.returnError(500, 'Internal Server Error', callback);
       return;
     }
     
@@ -141,14 +201,14 @@ module.exports.validate = (apiKeyValue, apiSecret, totpUuid, code, callback) => 
     const encryptedTotpKey = apiKeyRecord.totp[totpUuid].encryptedTotpKey;
     if (!encryptedTotpKey) {
       console.error('No encryptedTotpKey found in that TOTP record.');
-      response.returnError(500, 'Error validating TOTP code.', callback);
+      response.returnError(500, 'Internal Server Error', callback);
       return;
     }
     
     encryption.decrypt(encryptedTotpKey, apiSecret, (error, totpKey) => {
       if (error) {
-        console.error(error);
-        response.returnError(500, 'Error validating TOTP code.', callback);
+        console.error('Error validating TOTP code.', error);
+        response.returnError(500, 'Internal Server Error', callback);
         return;
       }
       
