@@ -101,22 +101,21 @@ module.exports.delete = (apiKeyValue, apiSecret, totpUuid, callback) => {
 };
 
 module.exports.validate = (apiKeyValue, apiSecret, totpUuid, code, callback) => {
-  
-  if (!totpUuid) {
-    console.log('TOTP validate request had no UUID.');
-    response.returnError(401, 'Unauthorized', callback);
-    return;
-  }
-  
-  if (!code) {
-    response.returnError(400, 'code (as a string) is required', callback);
-    return;
-  }
-  
   apiKey.getActivatedApiKey(apiKeyValue, apiSecret, (error, apiKeyRecord) => {
     if (error) {
       console.log('Unable to get activated API Key in order to validate TOTP:', error);
       response.returnError(401, 'Unauthorized', callback);
+      return;
+    }
+    
+    if (!totpUuid) {
+      console.log('TOTP validate request had no UUID.');
+      response.returnError(401, 'Unauthorized', callback);
+      return;
+    }
+    
+    if (!code) {
+      response.returnError(400, 'code (as a string) is required', callback);
       return;
     }
     
