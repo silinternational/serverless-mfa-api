@@ -66,16 +66,15 @@ module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} =
 };
 
 module.exports.delete = (apiKeyValue, apiSecret, totpUuid, callback) => {
-  
-  if (!totpUuid) {
-    console.log('TOTP delete request had no UUID.');
-    response.returnError(401, 'Unauthorized', callback);
-    return;
-  }
-  
   apiKey.getActivatedApiKey(apiKeyValue, apiSecret, (error, apiKeyRecord) => {
     if (error) {
       console.log('Unable to get activated API Key in order to delete TOTP:', error);
+      response.returnError(401, 'Unauthorized', callback);
+      return;
+    }
+    
+    if (!totpUuid) {
+      console.log('TOTP delete request had no UUID.');
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
