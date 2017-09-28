@@ -67,39 +67,15 @@ module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} =
 
 module.exports.delete = (apiKeyValue, apiSecret, totpUuid, callback) => {
   
-  if (!apiKeyValue) {
-    console.log('TOTP delete request had no API Key.');
-    response.returnError(401, 'Unauthorized', callback);
-    return;
-  }
-
-  if (!apiSecret) {
-    console.log('TOTP delete request had no API Secret.');
-    response.returnError(401, 'Unauthorized', callback);
-    return;
-  }
-  
   if (!totpUuid) {
     console.log('TOTP delete request had no UUID.');
     response.returnError(401, 'Unauthorized', callback);
     return;
   }
   
-  apiKey.getApiKeyByValue(apiKeyValue, (error, apiKeyRecord) => {
+  apiKey.getActivatedApiKey(apiKeyValue, apiSecret, (error, apiKeyRecord) => {
     if (error) {
-      console.error('Failed to retrieve API Key.', error);
-      response.returnError(500, 'Internal Server Error', callback);
-      return;
-    }
-    
-    if (!apiKeyRecord) {
-      console.log('No such API Key found:', apiKeyValue);
-      response.returnError(401, 'Unauthorized', callback);
-      return;
-    }
-    
-    if (!apiKey.isAlreadyActivated(apiKeyRecord)) {
-      console.log('API Key has not yet been activated.');
+      console.log('Unable to get activated API Key in order to delete TOTP:', error);
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
