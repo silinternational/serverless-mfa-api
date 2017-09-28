@@ -2,6 +2,7 @@
 
 const apiKey = require('../models/api-key.js');
 const encryption = require('../helpers/encryption.js');
+const password = require('../helpers/password.js');
 const qrCode = require('qrcode');
 const response = require('../helpers/response.js');
 const speakeasy = require('speakeasy');
