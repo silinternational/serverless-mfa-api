@@ -12,3 +12,9 @@ module.exports.compare = (givenPassword, hashedPassword) => {
 module.exports.hash = (password) => {
   return bcrypt.hashSync(password, 10);
 };
+
+module.exports.pretendToCompare = () => {
+  /* Perform a password hash so that the timing is similar to when we really do
+   * compare a password to a hash, to protect against timing attacks.  */
+  module.exports.hash('dummy text');
+};

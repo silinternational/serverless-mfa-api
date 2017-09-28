@@ -9,62 +9,9 @@ const speakeasy = require('speakeasy');
 const uuid = require('uuid');
 
 module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} = {}, callback) => {
-  if (!apiKeyValue) {
-    console.log('TOTP create request had no API Key.');
-    response.returnError(401, 'Unauthorized', callback);
-    return;
-  }
-  
-  if (!apiSecret) {
-    console.log('TOTP create request had no API Secret.');
-    response.returnError(401, 'Unauthorized', callback);
-    return;
-  }
-  
-  apiKey.getApiKeyByValue(apiKeyValue, (error, apiKeyRecord) => {
+  apiKey.getActivatedApiKey(apiKeyValue, apiSecret, (error, apiKeyRecord) => {
     if (error) {
-      console.error(error);
-      response.returnError(500, 'Internal Server Error', callback);
-      return;
-    }
-    
-    if (!apiKeyRecord) {
-      console.log('No such API Key found:', apiKeyValue);
-      
-      /* Perform a password hash so that the timing is similar to when there is
-       * an API Key with that value.  */
-      password.hash('dummy text');
-      
-      response.returnError(401, 'Unauthorized', callback);
-      return;
-    }
-    
-    if (!apiKeyRecord.hashedApiSecret) {
-      console.log(
-        'That API Key record (%s...) has no hashed API Secret',
-        apiKeyValue.substr(0, apiKeyValue.length / 2)
-      );
-      
-      /* Perform a password hash so that the timing is similar to when there is
-       * an API Key with that value.  */
-      password.hash('dummy text');
-      
-      response.returnError(401, 'Unauthorized', callback);
-      return;
-    }
-    
-    const isValidApiSecret = password.compare(apiSecret, apiKeyRecord.hashedApiSecret);
-    if (isValidApiSecret !== true) {
-      console.log(
-        'DANGER! A valid API Key value was provided (%s...), but an invalid API Secret came with it.',
-        apiKeyValue.substr(0, apiKeyValue.length / 2)
-      );
-      response.returnError(401, 'Unauthorized', callback);
-      return;
-    }
-    
-    if (!apiKey.isAlreadyActivated(apiKeyRecord)) {
-      console.log('API Key has not yet been activated.');
+      console.log('Unable to get activated API Key in order to create TOTP:', error);
       response.returnError(401, 'Unauthorized', callback);
       return;
     }

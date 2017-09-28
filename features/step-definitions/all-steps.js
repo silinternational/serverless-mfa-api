@@ -1,3 +1,4 @@
+const apiKey = require('../../models/api-key.js');
 const assert = require('assert');
 const crypto = require('crypto');
 const {defineSupportCode} = require('cucumber');
@@ -6,13 +7,23 @@ const password = require('../../helpers/password.js');
 
 defineSupportCode(function({Given, When, Then}) {
   let aesKeyBase64;
+  let apiKeyRecord;
   let apiSecret;
   let apiSecret2;
+  let apiSecretValidationResult;
   let decryptedMessage;
   let encryptedMessage;
   let hashedApiSecret;
   let hashedApiSecretCheck;
   let plainTextMessage;
+  
+  Given('I do not have an API Key record', function () {
+    apiKeyRecord = undefined;
+  });
+  
+  Given('I do NOT have an API Secret', function () {
+    apiSecret = undefined;
+  });
   
   Given('I have a 2nd API Secret that is different', function () {
     apiSecret2 = crypto.randomBytes(32).toString('base64');
@@ -29,6 +40,10 @@ defineSupportCode(function({Given, When, Then}) {
     hashedApiSecret = password.hash(apiSecret);
   });
   
+  Given('I have an API Key record', function () {
+    apiKeyRecord = {};
+  });
+  
   Given('I have an API Secret', function () {
     apiSecret = crypto.randomBytes(32).toString('base64');
     assert(apiSecret != undefined);
@@ -37,6 +52,22 @@ defineSupportCode(function({Given, When, Then}) {
   Given('I have encrypted a plain text message', function () {
     plainTextMessage = 'A plain text message';
     encryptedMessage = encryption.encrypt(plainTextMessage, aesKeyBase64);
+  });
+  
+  Given('the API Key record does NOT have a hashed API Secret', function () {
+    delete apiKeyRecord.hashedApiSecret;
+  });
+  
+  Given(/the API Key record has a hash of some (?:other|unknown) API Secret/, function () {
+    assert.notEqual(apiKeyRecord, undefined);
+    apiKeyRecord.hashedApiSecret = password.hash(
+      crypto.randomBytes(32).toString('base64')
+    );
+  });
+  
+  Given('the API Key record has a hash of the API Secret', function () {
+    assert.notEqual(apiKeyRecord, undefined);
+    apiKeyRecord.hashedApiSecret = password.hash(apiSecret);
   });
   
   When('I check the API Secret against the hashed API Secret', function () {
@@ -69,6 +100,18 @@ defineSupportCode(function({Given, When, Then}) {
   When('I encrypt a plain text message', function () {
     plainTextMessage = 'The test message';
     encryptedMessage = encryption.encrypt(plainTextMessage, aesKeyBase64);
+  });
+  
+  When('I validate my API Secret against the API Key record', function () {
+    apiSecretValidationResult = apiKey.isValidApiSecret(apiKeyRecord, apiSecret);
+  });
+  
+  Then('the API Secret should come back as NOT valid', function () {
+    assert.strictEqual(apiSecretValidationResult, false);
+  });
+  
+  Then('the API Secret should come back as valid', function () {
+    assert.strictEqual(apiSecretValidationResult, true);
   });
   
   Then('the decrypted message should match the plain text message', function () {
