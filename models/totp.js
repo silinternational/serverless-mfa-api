@@ -40,7 +40,10 @@ module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} =
     }
     
     if (!apiKeyRecord.hashedApiSecret) {
-      console.log('That API Key record (%s...) has no hashed API Secret', apiKeyValue);
+      console.log(
+        'That API Key record (%s...) has no hashed API Secret',
+        apiKeyValue.substr(0, apiKeyValue.length / 2)
+      );
       
       /* Perform a password hash so that the timing is similar to when there is
        * an API Key with that value.  */
