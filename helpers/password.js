@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 /**
  * WARNING: This requires strings, and if the value of hashedPassword is not an
