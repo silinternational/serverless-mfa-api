@@ -12,6 +12,8 @@ provider:
   #   256 MB = 71 ms
   #   128 MB = 159 ms
   memorySize: 512
+  apiKeys:
+    - ${self:custom.namespace}_global
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -39,6 +41,7 @@ functions:
       - http:
           path: api-key/activate
           method: post
+          private: true
   apiKeyCreate:
     handler: handlers/api-key.create
     name: ${self:custom.namespace}_apiKeyCreate
@@ -48,6 +51,7 @@ functions:
       - http:
           path: api-key
           method: post
+          private: true
   totpCreate:
     handler: handlers/totp.create
     name: ${self:custom.namespace}_totpCreate
