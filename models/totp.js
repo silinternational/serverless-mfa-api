@@ -2,39 +2,16 @@
 
 const apiKey = require('../models/api-key.js');
 const encryption = require('../helpers/encryption.js');
+const password = require('../helpers/password.js');
 const qrCode = require('qrcode');
 const response = require('../helpers/response.js');
 const speakeasy = require('speakeasy');
 const uuid = require('uuid');
 
 module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} = {}, callback) => {
-  if (!apiKeyValue) {
-    console.log('TOTP create request had no API Key.');
-    response.returnError(401, 'Unauthorized', callback);
-    return;
-  }
-  
-  if (!apiSecret) {
-    console.log('TOTP create request had no API Secret.');
-    response.returnError(401, 'Unauthorized', callback);
-    return;
-  }
-  
-  apiKey.getApiKeyByValue(apiKeyValue, (error, apiKeyRecord) => {
+  apiKey.getActivatedApiKey(apiKeyValue, apiSecret, (error, apiKeyRecord) => {
     if (error) {
-      console.error(error);
-      response.returnError(500, 'Internal Server Error', callback);
-      return;
-    }
-    
-    if (!apiKeyRecord) {
-      console.log('No such API Key found:', apiKeyValue);
-      response.returnError(401, 'Unauthorized', callback);
-      return;
-    }
-    
-    if (!apiKey.isAlreadyActivated(apiKeyRecord)) {
-      console.log('API Key has not yet been activated.');
+      console.log('Unable to get activated API Key in order to create TOTP:', error);
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
@@ -89,40 +66,15 @@ module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} =
 };
 
 module.exports.delete = (apiKeyValue, apiSecret, totpUuid, callback) => {
-  
-  if (!apiKeyValue) {
-    console.log('TOTP delete request had no API Key.');
-    response.returnError(401, 'Unauthorized', callback);
-    return;
-  }
-
-  if (!apiSecret) {
-    console.log('TOTP delete request had no API Secret.');
-    response.returnError(401, 'Unauthorized', callback);
-    return;
-  }
-  
-  if (!totpUuid) {
-    console.log('TOTP delete request had no UUID.');
-    response.returnError(401, 'Unauthorized', callback);
-    return;
-  }
-  
-  apiKey.getApiKeyByValue(apiKeyValue, (error, apiKeyRecord) => {
+  apiKey.getActivatedApiKey(apiKeyValue, apiSecret, (error, apiKeyRecord) => {
     if (error) {
-      console.error('Failed to retrieve API Key.', error);
-      response.returnError(500, 'Internal Server Error', callback);
-      return;
-    }
-    
-    if (!apiKeyRecord) {
-      console.log('No such API Key found:', apiKeyValue);
+      console.log('Unable to get activated API Key in order to delete TOTP:', error);
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
     
-    if (!apiKey.isAlreadyActivated(apiKeyRecord)) {
-      console.log('API Key has not yet been activated.');
+    if (!totpUuid) {
+      console.log('TOTP delete request had no UUID.');
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
@@ -149,46 +101,21 @@ module.exports.delete = (apiKeyValue, apiSecret, totpUuid, callback) => {
 };
 
 module.exports.validate = (apiKeyValue, apiSecret, totpUuid, code, callback) => {
-  
-  if (!apiKeyValue) {
-    console.log('TOTP validate request had no API Key.');
-    response.returnError(401, 'Unauthorized', callback);
-    return;
-  }
-
-  if (!apiSecret) {
-    console.log('TOTP validate request had no API Secret.');
-    response.returnError(401, 'Unauthorized', callback);
-    return;
-  }
-  
-  if (!totpUuid) {
-    console.log('TOTP validate request had no UUID.');
-    response.returnError(401, 'Unauthorized', callback);
-    return;
-  }
-  
-  if (!code) {
-    response.returnError(400, 'code (as a string) is required', callback);
-    return;
-  }
-  
-  apiKey.getApiKeyByValue(apiKeyValue, (error, apiKeyRecord) => {
+  apiKey.getActivatedApiKey(apiKeyValue, apiSecret, (error, apiKeyRecord) => {
     if (error) {
-      console.error('Failed to retrieve API Key.', error);
-      response.returnError(500, 'Internal Server Error', callback);
-      return;
-    }
-    
-    if (!apiKeyRecord) {
-      console.log('No such API Key found:', apiKeyValue);
+      console.log('Unable to get activated API Key in order to validate TOTP:', error);
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
     
-    if (!apiKey.isAlreadyActivated(apiKeyRecord)) {
-      console.log('API Key has not yet been activated.');
+    if (!totpUuid) {
+      console.log('TOTP validate request had no UUID.');
       response.returnError(401, 'Unauthorized', callback);
+      return;
+    }
+    
+    if (!code) {
+      response.returnError(400, 'code (as a string) is required', callback);
       return;
     }
     
