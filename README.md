@@ -5,6 +5,9 @@ Simple standalone API for creating and validating TOTP codes
 
 - A consumer of this API does a `POST` to `/api-key`, providing an email
   address.
+  * NOTE: To keep this API from being wide open to anyone, we protect our
+    endpoints at/under `/api-key` with API Gateway's built-in api keys, which
+    must be provided as an `x-api-key` header in the HTTP request.
 - We create a new API Key and email it to that email address.
 - The consumer does a `POST` to `/api-key/activate`, providing the email address
   and the API Key.
