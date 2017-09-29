@@ -5,7 +5,7 @@ Feature: API Secret validating
   
   Scenario: Not given an API Key record
     Given I have an API Secret
-      And I do not have an API Key record
+      And I do NOT have an API Key record
     When I validate my API Secret against the API Key record
     Then the API Secret should come back as NOT valid
   

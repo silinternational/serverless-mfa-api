@@ -17,7 +17,7 @@ defineSupportCode(function({Given, When, Then}) {
   let hashedApiSecretCheck;
   let plainTextMessage;
   
-  Given('I do not have an API Key record', function () {
+  Given('I do NOT have an API Key record', function () {
     apiKeyRecord = undefined;
   });
   
