@@ -10,9 +10,6 @@ module.exports.getTotpHeaders = (headers = {}) => {
 };
 
 module.exports.getJsonData = (jsonString) => {
-  var isOnlyWhitespace = /^\s+$/.test(jsonString);
-  if (isOnlyWhitespace) {
-    return {};
-  }
-  return JSON.parse(jsonString || '{}');
+  jsonString = jsonString || '{}';
+  return JSON.parse(jsonString.trim() || '{}');
 };
