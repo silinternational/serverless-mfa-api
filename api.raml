@@ -1,54 +1,92 @@
 #%RAML 1.0
 title: TOTP API
 version: v1
-baseUri: http://api.samplehost.com
-types:
-  TestType:
-    type: object
-    properties:
-      id: number
-      optional?: string
-      expanded:
-        type: object
-        properties:
-          count: number
+baseUri: https://api.samplehost.com
+protocols: [HTTPS]
 
-/key:
-  description: Register for a new API Key/Secret. This endpoint will send an email with the ApiKey. You must then make another call to /register/activate with the email address and api_key to get an api_secret. Protect your api_key as a secret.
+/api-key:
+  description: |
+    Create a new API Key for this API. This endpoint will send an email with a
+    new, unique API Key. You must then make a separate call to activate that API
+    Key. Protect your API Key as a secret.
   post:
+    headers:
+      x-api-key:
+        description: The AWS API Gateway api key's value (obtained from AWS).
+        required: true
     body:
       application/json:
         properties:
           email:
             type: string
             required: true
+        example: |
+          {
+            "email": "john_smith@example.com"
+          }
     responses:
       204:
+        description: |
+          The API Key was successfully created, and an email will be sent to the
+          given email address with the API Key's value.
+      400:
+        description: |
+          The request was unacceptable for some reason. See the error message.
       401:
+      403:
+        description: |
+          No valid API Gateway api key was provided (not to be confused with
+          our internal API Keys).
 
-/key/activate:
-  description: Activate an account using the api_key received in an email. Returns api_secret needed for further calls. This call can only be made once per api_key, so make sure you save the secret somewhere safe.
+/api-key/activate:
+  description: |
+    Activate a recently-created API Key. Returns the API Secret needed for
+    further calls. This call can only be made once per API Key, so make sure you
+    save the API Secret somewhere safe.
   post:
+    headers:
+      x-api-key:
+        description: The AWS API Gateway api key's value (obtained from AWS).
+        required: true
     body:
       application/json:
         properties:
           email:
             type: string
             required: true
-          api_key:
+          apiKey:
             type: string
             required: true
+        example: |
+          {
+            "email": "john_smith@example.com",
+            "apiKey": "0123456789abcdef0123456789abcdef01234567"
+          }
     responses:
       200:
         body:
           application/json:
             properties:
-              api_secret:
+              apiSecret:
                 type: string
+            example: |
+              {
+                "apiSecret": "ABCDEFGHIJKLMNOPQRSTUVWXYZ+abcdefgh/ijklmno="
+              }
       401:
+      403:
+        description: |
+          No valid API Gateway api key was provided (not to be confused with
+          our internal API Keys).
       404:
+        description: |
+          No such API key was found with that email address.
 
 /totp:
+  description: |
+    Create a new TOTP account. This will return a UUID for that account, along
+    with a TOTP key and barcode for the end-user to type in or scan in order to
+    add an account to their TOTP-compatible smartphone app.
   post:
     headers:
       X-TOTP-ApiKey:
@@ -57,22 +95,41 @@ types:
       X-TOTP-ApiSecret:
         description: API Secret
         required: true
+    body:
+      application/json:
+        properties:
+          issuer:
+            description: |
+              The name of the service/website for which the user is setting up
+              this TOTP account.
+            type: string
+            required: false
+          label:
+            description: |
+              A name for the user's account (such as their username).
+            type: string
+            required: false
+        example: |
+          {
+            "issuer": "Acme",
+            "label": "john_smith@example.com"
+          }
     responses:
       200:
         body:
           application/json:
             example: |
               {
-                "id": "28123f10-e33d-5533-b53f-111ef8d7b14f",
-                "key": "28123f10-e33d-5533-b53f-111ef8d7b14f",
-                "image_url": "data:image/gif;base64,..."
+                "uuid": "aaaaaaaa-1111-aaaa-1111-aaaaaaaaaaaa",
+                "totpKey": "aaaa bbbb cccc dddd",
+                "imageUrl": "data:image/gif;base64,..."
               }
       401:
 
-/totp/{id}:
+/totp/{uuid}:
   uriParameters:
-    id:
-      description: TOTP ID
+    uuid:
+      description: The TOTP account's UUID.
       type: string
       required: true
   delete:
@@ -87,11 +144,12 @@ types:
       204:
       401:
       404:
+      500:
 
-/totp/{id}/validate:
+/totp/{uuid}/validate:
   uriParameters:
-    id:
-      description: TOTP ID
+    uuid:
+      description: TOTP UUID
       type: string
       required: true
   post:
@@ -111,5 +169,8 @@ types:
           {"code": "012345"}
     responses:
       204:
+      400:
+        description: |
+          The request body was invlalid, such as if no `code` value was found.
       401:
       404:

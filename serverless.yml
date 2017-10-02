@@ -1,0 +1,119 @@
+service: totp-api
+
+frameworkVersion: ">=1.21.0 <2.0.0"
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  
+  # Experimented with various memory sizes. Manually calling the totpValidate
+  # function once every few seconds, the average durations were as follows:
+  #   512 MB = 48 ms
+  #   256 MB = 71 ms
+  #   128 MB = 159 ms
+  memorySize: 512
+  apiKeys:
+    - ${self:custom.namespace}_global
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:us-east-1:*:*"
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  namespace: ${self:service}_${self:custom.stage}
+  apiKeyTable: ${self:custom.namespace}_api-key
+
+package:
+  exclude:
+    - node_modules/aws-sdk/**
+
+functions:
+  apiKeyActivate:
+    handler: handlers/api-key.activate
+    name: ${self:custom.namespace}_apiKeyActivate
+    environment:
+      TABLE_NAME: ${self:custom.apiKeyTable}
+    events:
+      - http:
+          path: api-key/activate
+          method: post
+          private: true
+  apiKeyCreate:
+    handler: handlers/api-key.create
+    name: ${self:custom.namespace}_apiKeyCreate
+    environment:
+      TABLE_NAME: ${self:custom.apiKeyTable}
+    events:
+      - http:
+          path: api-key
+          method: post
+          private: true
+  totpCreate:
+    handler: handlers/totp.create
+    name: ${self:custom.namespace}_totpCreate
+    environment:
+      TABLE_NAME: ${self:custom.apiKeyTable}
+    events:
+      - http:
+          path: totp
+          method: post
+  totpDelete:
+    handler: handlers/totp.delete
+    name: ${self:custom.namespace}_totpDelete
+    environment:
+      TABLE_NAME: ${self:custom.apiKeyTable}
+    events:
+      - http:
+          path: totp/{uuid}
+          method: delete
+  totpValidate:
+    handler: handlers/totp.validate
+    name: ${self:custom.namespace}_totpValidate
+    environment:
+      TABLE_NAME: ${self:custom.apiKeyTable}
+    events:
+      - http:
+          path: totp/{uuid}/validate
+          method: post
+
+resources:
+  Resources:
+    ApiKeyDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: value
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: value
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: '${self:custom.apiKeyTable}'
+    ApiKeyActivateLogGroup:
+      Properties:
+        RetentionInDays: "30"
+    ApiKeyCreateLogGroup:
+      Properties:
+        RetentionInDays: "30"
+    TotpCreateLogGroup:
+      Properties:
+        RetentionInDays: "30"
+    TotpDeleteLogGroup:
+      Properties:
+        RetentionInDays: "30"
+    TotpValidateLogGroup:
+      Properties:
+        RetentionInDays: "30"
