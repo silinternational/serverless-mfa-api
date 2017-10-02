@@ -10,6 +10,10 @@ protocols: [HTTPS]
     new, unique API Key. You must then make a separate call to activate that API
     Key. Protect your API Key as a secret.
   post:
+    headers:
+      x-api-key:
+        description: The AWS API Gateway api key's value (obtained from AWS).
+        required: true
     body:
       application/json:
         properties:
@@ -29,6 +33,10 @@ protocols: [HTTPS]
         description: |
           The request was unacceptable for some reason. See the error message.
       401:
+      403:
+        description: |
+          No valid API Gateway api key was provided (not to be confused with
+          our internal API Keys).
 
 /api-key/activate:
   description: |
@@ -36,6 +44,10 @@ protocols: [HTTPS]
     further calls. This call can only be made once per API Key, so make sure you
     save the API Secret somewhere safe.
   post:
+    headers:
+      x-api-key:
+        description: The AWS API Gateway api key's value (obtained from AWS).
+        required: true
     body:
       application/json:
         properties:
@@ -62,6 +74,10 @@ protocols: [HTTPS]
                 "apiSecret": "ABCDEFGHIJKLMNOPQRSTUVWXYZ+abcdefgh/ijklmno="
               }
       401:
+      403:
+        description: |
+          No valid API Gateway api key was provided (not to be confused with
+          our internal API Keys).
       404:
         description: |
           No such API key was found with that email address.

@@ -10,5 +10,6 @@ module.exports.getTotpHeaders = (headers = {}) => {
 };
 
 module.exports.getJsonData = (jsonString) => {
-  return JSON.parse(jsonString || '{}');
+  jsonString = jsonString || '{}';
+  return JSON.parse(jsonString.trim() || '{}');
 };
