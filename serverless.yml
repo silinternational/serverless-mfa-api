@@ -102,3 +102,18 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: '${self:custom.apiKeyTable}'
+    ApiKeyActivateLogGroup:
+      Properties:
+        RetentionInDays: "30"
+    ApiKeyCreateLogGroup:
+      Properties:
+        RetentionInDays: "30"
+    TotpCreateLogGroup:
+      Properties:
+        RetentionInDays: "30"
+    TotpDeleteLogGroup:
+      Properties:
+        RetentionInDays: "30"
+    TotpValidateLogGroup:
+      Properties:
+        RetentionInDays: "30"
