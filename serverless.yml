@@ -31,6 +31,10 @@ custom:
   namespace: ${self:service}_${self:custom.stage}
   apiKeyTable: ${self:custom.namespace}_api-key
 
+package:
+  exclude:
+    - node_modules/aws-sdk/**
+
 functions:
   apiKeyActivate:
     handler: handlers/api-key.activate
