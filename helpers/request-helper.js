@@ -1,9 +1,9 @@
-module.exports.getTotpHeaders = (headers = {}) => {
+module.exports.getMfaHeaders = (headers = {}) => {
   let totpHeaders = {};
   for (name in headers) {
     let lowercaseName = name.toLowerCase();
-    if (lowercaseName.substr(0, 7) === 'x-totp-') {
-      totpHeaders[lowercaseName.substr(7)] = headers[name];
+    if (lowercaseName.substr(0, 6) === 'x-mfa-') {
+      totpHeaders[lowercaseName.substr(6)] = headers[name];
     }
   }
   return totpHeaders;

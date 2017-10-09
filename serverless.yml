@@ -83,6 +83,51 @@ functions:
       - http:
           path: totp/{uuid}/validate
           method: post
+  u2fCreateAuthentication:
+    handler: handlers/u2f.createAuthentication
+    name: ${self:custom.namespace}_u2fCreateAuthentication
+    environment:
+      TABLE_NAME: ${self:custom.apiKeyTable}
+    events:
+      - http:
+          path: u2f/{uuid}/auth
+          method: post
+  u2fCreateRegistration:
+    handler: handlers/u2f.createRegistration
+    name: ${self:custom.namespace}_u2fCreateRegistration
+    environment:
+      TABLE_NAME: ${self:custom.apiKeyTable}
+    events:
+      - http:
+          path: u2f
+          method: post
+  u2fDelete:
+    handler: handlers/u2f.delete
+    name: ${self:custom.namespace}_u2fDelete
+    environment:
+      TABLE_NAME: ${self:custom.apiKeyTable}
+    events:
+      - http:
+          path: u2f/{uuid}
+          method: delete
+  u2fValidateAuthentication:
+    handler: handlers/u2f.validateAuthentication
+    name: ${self:custom.namespace}_u2fValidateAuthentication
+    environment:
+      TABLE_NAME: ${self:custom.apiKeyTable}
+    events:
+      - http:
+          path: u2f/{uuid}/auth
+          method: put
+  u2fValidateRegistration:
+    handler: handlers/u2f.validateRegistration
+    name: ${self:custom.namespace}_u2fValidateRegistration
+    environment:
+      TABLE_NAME: ${self:custom.apiKeyTable}
+    events:
+      - http:
+          path: u2f/{uuid}
+          method: put
 
 resources:
   Resources:
@@ -117,3 +162,19 @@ resources:
     TotpValidateLogGroup:
       Properties:
         RetentionInDays: "30"
+    U2fCreateAuthenticationLogGroup:
+      Properties:
+        RetentionInDays: "30"
+    U2fCreateRegistrationLogGroup:
+      Properties:
+        RetentionInDays: "30"
+    U2fDeleteLogGroup:
+      Properties:
+        RetentionInDays: "30"
+    U2fValidateAuthenticationLogGroup:
+      Properties:
+        RetentionInDays: "30"
+    U2fValidateRegistrationLogGroup:
+      Properties:
+        RetentionInDays: "30"
+
