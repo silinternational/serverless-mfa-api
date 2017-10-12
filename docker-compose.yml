@@ -4,4 +4,3 @@ services:
     build: .
     volumes:
       - ./:/usr/src/app
-      - /Users/shipley/.aws/credentials:/root/.aws/credentials:ro
