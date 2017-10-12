@@ -85,7 +85,7 @@ module.exports.createAuthentication = (apiKeyValue, apiSecret, u2fUuid, callback
 };
 
 module.exports.createRegistration = (apiKeyValue, apiSecret, {appId} = {}, callback) => {
-  console.log('Begin creating U2F registration for uuid: ' + u2fUuid);
+  console.log('Begin creating U2F registration');
   apiKey.getActivatedApiKey(apiKeyValue, apiSecret, (error, apiKeyRecord) => {
     if (error) {
       console.log('Unable to get activated API Key in order to create U2F:', error);
@@ -204,7 +204,7 @@ module.exports.validateAuthentication = (apiKeyValue, apiSecret, u2fUuid, {signR
       }
 
       encryption.decrypt(encryptedPublicKey, apiSecret, (error, publicKey) => {
-        const result = u2f.checkSignature(JSON.parse(authenticationRequest), JSON.parse(signResult), publicKey);
+        const result = u2f.checkSignature(JSON.parse(authenticationRequest), signResult, publicKey);
         if (result.errorMessage) {
           console.error('Error validating U2F authentication. Error: ' + result.errorMessage);
           response.returnError(400, result.errorMessage, callback);
