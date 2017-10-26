@@ -37,50 +37,49 @@ protocols: [HTTPS]
         description: |
           No valid API Gateway api key was provided (not to be confused with
           our internal API Keys).
-
-/api-key/activate:
-  description: |
-    Activate a recently-created API Key. Returns the API Secret needed for
-    further calls. This call can only be made once per API Key, so make sure you
-    save the API Secret somewhere safe.
-  post:
-    headers:
-      x-api-key:
-        description: The AWS API Gateway api key's value (obtained from AWS).
-        required: true
-    body:
-      application/json:
-        properties:
-          email:
-            type: string
-            required: true
-          apiKey:
-            type: string
-            required: true
-        example: |
-          {
-            "email": "john_smith@example.com",
-            "apiKey": "0123456789abcdef0123456789abcdef01234567"
-          }
-    responses:
-      200:
-        body:
-          application/json:
-            properties:
-              apiSecret:
-                type: string
-            example: |
-              {
-                "apiSecret": "ABCDEFGHIJKLMNOPQRSTUVWXYZ+abcdefgh/ijklmno="
-              }
-      401:
-      403:
-        description: |
-          No valid API Gateway api key was provided (not to be confused with
-          our internal API Keys).
-      404:
-        description: |
-          No such API key was found with that email address.
+  /activate:
+    description: |
+      Activate a recently-created API Key. Returns the API Secret needed for
+      further calls. This call can only be made once per API Key, so make sure you
+      save the API Secret somewhere safe.
+    post:
+      headers:
+        x-api-key:
+          description: The AWS API Gateway api key's value (obtained from AWS).
+          required: true
+      body:
+        application/json:
+          properties:
+            email:
+              type: string
+              required: true
+            apiKey:
+              type: string
+              required: true
+          example: |
+            {
+              "email": "john_smith@example.com",
+              "apiKey": "0123456789abcdef0123456789abcdef01234567"
+            }
+      responses:
+        200:
+          body:
+            application/json:
+              properties:
+                apiSecret:
+                  type: string
+              example: |
+                {
+                  "apiSecret": "ABCDEFGHIJKLMNOPQRSTUVWXYZ+abcdefgh/ijklmno="
+                }
+        401:
+        403:
+          description: |
+            No valid API Gateway api key was provided (not to be confused with
+            our internal API Keys).
+        404:
+          description: |
+            No such API key was found with that email address.
 
 /totp:
   description: |
@@ -125,55 +124,48 @@ protocols: [HTTPS]
                 "imageUrl": "data:image/gif;base64,..."
               }
       401:
-
-/totp/{uuid}:
-  uriParameters:
-    uuid:
-      description: The TOTP account's UUID.
-      type: string
-      required: true
-  delete:
-    headers:
-      X-MFA-ApiKey:
-        description: API Key
+  /{uuid}:
+    uriParameters:
+      uuid:
+        description: The TOTP account's UUID.
+        type: string
         required: true
-      X-MFA-ApiSecret:
-        description: API Secret
-        required: true
-    responses:
-      204:
-      401:
-      404:
-      500:
-
-/totp/{uuid}/validate:
-  uriParameters:
-    uuid:
-      description: TOTP UUID
-      type: string
-      required: true
-  post:
-    headers:
-      X-MFA-ApiKey:
-        description: API Key
-        required: true
-      X-MFA-ApiSecret:
-        description: API Secret
-        required: true
-    body:
-      application/json:
-        properties:
-          code:
-            type: string
-        example: |
-          {"code": "012345"}
-    responses:
-      204:
-      400:
-        description: |
-          The request body was invlalid, such as if no `code` value was found.
-      401:
-      404:
+    delete:
+      headers:
+        X-MFA-ApiKey:
+          description: API Key
+          required: true
+        X-MFA-ApiSecret:
+          description: API Secret
+          required: true
+      responses:
+        204:
+        401:
+        404:
+        500:
+    /validate:
+      post:
+        headers:
+          X-MFA-ApiKey:
+            description: API Key
+            required: true
+          X-MFA-ApiSecret:
+            description: API Secret
+            required: true
+        body:
+          application/json:
+            properties:
+              code:
+                type: string
+            example: |
+              {"code": "012345"}
+        responses:
+          204:
+          400:
+            description: |
+              The request body was invlalid, such as if no `code` value was found.
+          401:
+          404:
 
 /u2f:
   description: |
