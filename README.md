@@ -1,5 +1,5 @@
 # Serverless MFA API
-A Serverless API for registering and validating Multi-Factory Authentication methods. 
+A Serverless API for registering and validating Multi-Factor Authentication methods.
 
 Currently supports Time-based One Time Passwords (TOTP) and FIDO U2F devices (YubiKeys).
 
@@ -36,40 +36,40 @@ For details about the various API endpoints, see
 ### U2F Registration
 - The consumer does a `POST` to `/u2f`, providing their API Key and API Secret
   in the headers as well as the `appId` in the JSON body.
-- We respond with an object including the UUID for further API calls as well as 
-  the challenge object to be passed along to the browser's `u2f.register()` call. 
+- We respond with an object including the UUID for further API calls as well as
+  the challenge object to be passed along to the browser's `u2f.register()` call.
 - The consumer uses the `u2f.register()` javascript API call in the browser.
 - The end user inserts their FIDO U2F device and the light should be blinking and
   the user presses the button on the device.
 - Pressing the button will trigger the callback method provided to the `u2f.register()`
-  call which should pass the response object to the consumer's service, which in turn 
+  call which should pass the response object to the consumer's service, which in turn
   can make a `PUT` call to `/mfa/{uuid}` with a JSON body including a property named
   `signResult` with a value of the object returned from the U2F device.
 - We will validate the response and store the `keyHandle` and `publicKey` encrypted by
-  the consumer's API Secret and respond with a success or error message. 
+  the consumer's API Secret and respond with a success or error message.
 
 ### U2F Authentication
 - The consumer does a `POST` to `/u2f/{uuid}/auth`, providing their API Key and API Secret
   in the headers.
-- We respond with the challenge object to be passed along to the the browser's `u2f.sign()`
+- We respond with the challenge object to be passed along to the browser's `u2f.sign()`
   call.
 - The end user inserts their FIDO U2F device and the light should be blinking and
   the user presses the button on the device.
 - Pressing the button will trigger the callback method provided to the `u2f.sign()`
-  call which should pass the response object to the consumer's service, which in turn 
+  call which should pass the response object to the consumer's service, which in turn
   can make a `PUT` call to `/mfa/{uuid}/auth` with a JSON body including a property named
   `signResult` with a value of the object returned from the U2F device.
-- We will validate the signResult and respond with a success or error message. 
+- We will validate the signResult and respond with a success or error message.
 
 ## Notes about FIDO U2F
 - [FIDO U2F](https://www.yubico.com/solutions/fido-u2f/) is still relatively new with very limited support
-  by browsers. In fact it is really only supported in Chrome without the need of installing extensions. 
-- Interaction with U2F devices either requires integration at a very low level or the use of 
+  by browsers. In fact it is really only supported in Chrome without the need of installing extensions.
+- Interaction with U2F devices either requires integration at a very low level or the use of
   a higher level javascript API. Oddly enough, the javascript API is not maintained in
   a distributable format. A copy of it can be obtained from YubiCo at https://demo.yubico.com/js/u2f-api.js
   or as part of a demo application from Google's GitHub: https://raw.githubusercontent.com/google/u2f-ref-code/master/u2f-gae-demo/war/js/u2f-api.js
 - The `appId` used in the registration process must match the URL of the page where the user is authenticating and it
-  must be HTTPS. It does  not need the full path though, so https://myapp.com is sufficient if the page is at 
+  must be HTTPS. It does  not need the full path though, so https://myapp.com is sufficient if the page is at
   https://myapp.com/auth/login.
 
 ## Continuous Integration / Continuous Deployment (CI/CD)
