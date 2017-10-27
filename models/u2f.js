@@ -16,7 +16,7 @@ module.exports.createAuthentication = (apiKeyValue, apiSecret, u2fUuid, callback
     }
 
     if (!u2fUuid) {
-      console.log('U2F delete request had no UUID.');
+      console.log('U2F create authentication request had no UUID.');
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
@@ -242,7 +242,7 @@ module.exports.validateRegistration = (apiKeyValue, apiSecret, u2fUuid, {signRes
     }
 
     if (!u2fUuid) {
-      console.log('U2F validate authentication request had no UUID.');
+      console.log('U2F validate registration request had no UUID.');
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
