@@ -31,6 +31,8 @@ custom:
   stage: ${opt:stage, self:provider.stage}
   namespace: ${self:service}_${self:custom.stage}
   apiKeyTable: ${self:custom.namespace}_api-key
+  totpTable: ${self:custom.namespace}_totp
+  u2fTable: ${self:custom.namespace}_u2f
 
 package:
   exclude:
@@ -62,6 +64,7 @@ functions:
     name: ${self:custom.namespace}_totpCreate
     environment:
       API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
+      TOTP_TABLE_NAME: ${self:custom.totpTable}
     events:
       - http:
           path: totp
@@ -71,6 +74,7 @@ functions:
     name: ${self:custom.namespace}_totpDelete
     environment:
       API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
+      TOTP_TABLE_NAME: ${self:custom.totpTable}
     events:
       - http:
           path: totp/{uuid}
@@ -80,6 +84,7 @@ functions:
     name: ${self:custom.namespace}_totpValidate
     environment:
       API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
+      TOTP_TABLE_NAME: ${self:custom.totpTable}
     events:
       - http:
           path: totp/{uuid}/validate
@@ -89,6 +94,7 @@ functions:
     name: ${self:custom.namespace}_u2fCreateAuthentication
     environment:
       API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
+      U2F_TABLE_NAME: ${self:custom.u2fTable}
     events:
       - http:
           path: u2f/{uuid}/auth
@@ -98,6 +104,7 @@ functions:
     name: ${self:custom.namespace}_u2fCreateRegistration
     environment:
       API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
+      U2F_TABLE_NAME: ${self:custom.u2fTable}
     events:
       - http:
           path: u2f
@@ -107,6 +114,7 @@ functions:
     name: ${self:custom.namespace}_u2fDelete
     environment:
       API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
+      U2F_TABLE_NAME: ${self:custom.u2fTable}
     events:
       - http:
           path: u2f/{uuid}
@@ -116,6 +124,7 @@ functions:
     name: ${self:custom.namespace}_u2fValidateAuthentication
     environment:
       API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
+      U2F_TABLE_NAME: ${self:custom.u2fTable}
     events:
       - http:
           path: u2f/{uuid}/auth
@@ -125,6 +134,7 @@ functions:
     name: ${self:custom.namespace}_u2fValidateRegistration
     environment:
       API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
+      U2F_TABLE_NAME: ${self:custom.u2fTable}
     events:
       - http:
           path: u2f/{uuid}
@@ -148,6 +158,38 @@ resources:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
         TableName: '${self:custom.apiKeyTable}'
+    TotpDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: uuid
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: uuid
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        TableName: '${self:custom.totpTable}'
+    U2fDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: uuid
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: uuid
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        TableName: '${self:custom.u2fTable}'
     ApiKeyActivateLogGroup:
       Properties:
         RetentionInDays: "30"
@@ -178,4 +220,3 @@ resources:
     U2fValidateRegistrationLogGroup:
       Properties:
         RetentionInDays: "30"
-
