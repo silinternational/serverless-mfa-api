@@ -92,7 +92,7 @@ module.exports.delete = (apiKeyValue, apiSecret, totpUuid, callback) => {
       return;
     }
     
-    getTotpRecord(totpUuid, apiKeyValue, (totpRecord, error) => {
+    getTotpRecord(totpUuid, apiKeyValue, (error, totpRecord) => {
       if (error) {
         console.error('Error while getting TOTP to be deleted.', error);
         response.returnError(500, 'Internal Server Error', callback);
@@ -196,7 +196,7 @@ module.exports.validate = (apiKeyValue, apiSecret, totpUuid, code, callback) => 
       return;
     }
     
-    getTotpRecord(totpUuid, apiKeyValue, (totpRecord, error) => {
+    getTotpRecord(totpUuid, apiKeyValue, (error, totpRecord) => {
       if (error) {
         console.error('Error while getting TOTP record for validating a code.', error);
         response.returnError(500, 'Internal Server Error', callback);
