@@ -74,7 +74,10 @@ module.exports.create = (email, callback) => {
       email: email,
       value: apiKeyValue
     },
-    ConditionExpression : 'attribute_not_exists(value)'
+    ConditionExpression : 'attribute_not_exists(#v)',
+    ExpressionAttributeNames: {
+      '#v': 'value'
+    }
   };
   
   dynamoDb.put(params, (error, result) => {
