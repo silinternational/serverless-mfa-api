@@ -23,65 +23,71 @@ module.exports.createAuthentication = (apiKeyValue, apiSecret, u2fUuid, callback
       return;
     }
 
-    if (!apiKeyRecord.u2f || !apiKeyRecord.u2f[u2fUuid]) {
-      console.log('API Key has no such U2F uuid.');
-      response.returnError(404, 'No U2F entry found with that uuid for that API Key.', callback);
-      return;
-    }
-
-    const encryptedAppId = apiKeyRecord.u2f[u2fUuid].encryptedAppId;
-    if (!encryptedAppId) {
-      console.error('No encryptedAppId found in that U2F record.');
-      response.returnError(500, 'Internal Server Error', callback);
-      return;
-    }
-
-    encryption.decrypt(encryptedAppId, apiSecret, (error, appId) => {
+    getU2fRecord(u2fUuid, apiKeyValue, (error, u2fRecord) => {
       if (error) {
-        console.error('Error validating AppId', error);
+        console.error('Error while getting U2F record when creating U2F authentication.', error);
+        response.returnError(500, 'Internal Server Error', callback);
+        return;
+      }
+      
+      if (!u2fRecord || (u2fRecord.apiKey !== apiKeyValue)) {
+        console.log('API Key has no such U2F uuid.');
+        response.returnError(404, 'No U2F record found with that uuid for that API Key.', callback);
+        return;
+      }
+      
+      const encryptedAppId = u2fRecord.encryptedAppId;
+      if (!encryptedAppId) {
+        console.error('No encryptedAppId found in that U2F record.');
         response.returnError(500, 'Internal Server Error', callback);
         return;
       }
 
-      const encryptedKeyHandle = apiKeyRecord.u2f[u2fUuid].encryptedKeyHandle;
-      if (!encryptedKeyHandle) {
-        console.error('No encryptedKeyHandle found in that U2F record.');
-        response.returnError(500, 'Internal Server Error', callback);
-        return;
-      }
-
-      encryption.decrypt(encryptedKeyHandle, apiSecret, (error, keyHandle) => {
+      encryption.decrypt(encryptedAppId, apiSecret, (error, appId) => {
         if (error) {
-          console.error('Error validating KeyHandle', error);
+          console.error('Error validating AppId', error);
           response.returnError(500, 'Internal Server Error', callback);
           return;
         }
 
-        const authRequest = u2f.request(appId, keyHandle);
+        const encryptedKeyHandle = u2fRecord.encryptedKeyHandle;
+        if (!encryptedKeyHandle) {
+          console.error('No encryptedKeyHandle found in that U2F record.');
+          response.returnError(500, 'Internal Server Error', callback);
+          return;
+        }
 
-        apiKeyRecord.u2f[u2fUuid].encryptedAuthenticationRequest = encryption.encrypt(JSON.stringify(authRequest), apiSecret);
-        apiKey.updateApiKeyRecord(apiKeyRecord, (error) => {
+        encryption.decrypt(encryptedKeyHandle, apiSecret, (error, keyHandle) => {
           if (error) {
-            console.error('Failed to create new U2F authentication request.', error);
+            console.error('Error validating KeyHandle', error);
             response.returnError(500, 'Internal Server Error', callback);
             return;
           }
 
-          const apiResponse = {
-            'uuid': u2fUuid,
-            'version': authRequest.version,
-            'challenge': authRequest.challenge,
-            'appId': appId,
-            'keyHandle': keyHandle
-          };
+          const authRequest = u2f.request(appId, keyHandle);
 
-          console.log("Successfully created U2F authentication for uuid: " + u2fUuid);
-          response.returnSuccess(apiResponse, callback);
-          return;
+          u2fRecord.encryptedAuthenticationRequest = encryption.encrypt(JSON.stringify(authRequest), apiSecret);
+          updateU2fRecord(u2fRecord, (error) => {
+            if (error) {
+              console.error('Failed to save new U2F authentication request.', error);
+              response.returnError(500, 'Internal Server Error', callback);
+              return;
+            }
+
+            const apiResponse = {
+              'uuid': u2fUuid,
+              'version': authRequest.version,
+              'challenge': authRequest.challenge,
+              'appId': appId,
+              'keyHandle': keyHandle
+            };
+
+            console.log("Successfully created U2F authentication for uuid: " + u2fUuid);
+            response.returnSuccess(apiResponse, callback);
+            return;
+          });
         });
-
       });
-
     });
   });
 };
@@ -170,6 +176,55 @@ module.exports.delete = (apiKeyValue, apiSecret, u2fUuid, callback) => {
       response.returnSuccess(null, callback);
       return;
     });
+  });
+};
+
+const getU2fRecord = (uuid, apiKeyValue, callback) => {
+  const params = {
+    TableName: process.env.U2F_TABLE_NAME,
+    Key: {
+      'uuid': uuid
+    },
+    ConditionExpression: 'apiKey = :apiKey',
+    ExpressionAttributeValues: {
+      ':apiKey': apiKeyValue
+    }
+  };
+  
+  dynamoDb.get(params, (error, result) => {
+    if (error) {
+      console.error(error);
+      callback(new Error('Failed to retrieve that U2F record.'));
+      return;
+    }
+    /* NOTE: Asking for a record that doesn't exist is NOT an error, you simply
+     *       get an empty result back.  */
+    
+    if (result.Item && (result.Item.apiKey !== apiKeyValue)) {
+      console.error('AWS ConditionExpression FAILED to limit U2F record by apiKey value.');
+      callback(new Error('Failed to retrieve the correct U2F record.'));
+      return;
+    }
+    
+    callback(null, result.Item);
+    return;
+  });
+};
+
+const updateU2fRecord = (u2fRecord, callback) => {
+  const params = {
+    TableName: process.env.U2F_TABLE_NAME,
+    Item: u2fRecord,
+    ConditionExpression: 'attribute_exists(#u)',
+    ExpressionAttributeNames: {
+      '#u': 'uuid'
+    }
+  };
+  
+  dynamoDb.put(params, (error) => {
+    // Only send our callback the (potential) error, rather than all of the
+    // parameters that dynamoDb.put would send.
+    callback(error);
   });
 };
 
