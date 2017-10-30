@@ -154,7 +154,6 @@ const getApiKeyByValue = (value, callback) => {
     return;
   });
 };
-module.exports.getApiKeyByValue = getApiKeyByValue;
 
 const isAlreadyActivated = (apiKeyRecord) => {
   return Boolean(apiKeyRecord && apiKeyRecord.activatedAt);
