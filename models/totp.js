@@ -130,9 +130,7 @@ const deleteTotpRecord = (totpRecord, callback) => {
       '#u': 'uuid'
     },
     ExpressionAttributeValues: {
-      ':apiKey': {
-        'S': totpRecord.apiKey
-      }
+      ':apiKey': totpRecord.apiKey
     }
   };
   
