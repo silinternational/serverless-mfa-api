@@ -35,19 +35,17 @@ module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} =
         return;
       }
       
+      const totpUuid = uuid.v4();
       const totpKey = otpSecrets.base32;
-      var totpUuid = uuid.v4();
-      apiKeyRecord.totp = apiKeyRecord.totp || {};
-      while (apiKeyRecord.totp[totpUuid]) {
-        console.log('Initial UUID was already in use. Generating a new one.');
-        totpUuid = uuid.v4();
-      }
-      apiKeyRecord.totp[totpUuid] = {
+      const totpRecord = {
+        'uuid': totpUuid,
+        'apiKey': apiKeyValue,
         'encryptedTotpKey': encryption.encrypt(totpKey, apiSecret)
       };
-      apiKey.updateApiKeyRecord(apiKeyRecord, (error) => {
+      
+      createNewTotpRecord(totpRecord, (error) => {
         if (error) {
-          console.error('Failed to create new TOTP entry.', error);
+          console.error('Failed to create new TOTP record.', error);
           response.returnError(500, 'Internal Server Error', callback);
           return;
         }
@@ -63,6 +61,16 @@ module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} =
       });
     });
   });
+};
+
+const createNewTotpRecord = (totpRecord, callback) => {
+  const params = {
+    TableName: process.env.TOTP_TABLE_NAME,
+    Item: totpRecord,
+    ConditionExpression : 'attribute_not_exists(uuid)'
+  };
+  
+  dynamoDb.put(params, callback);
 };
 
 module.exports.delete = (apiKeyValue, apiSecret, totpUuid, callback) => {
