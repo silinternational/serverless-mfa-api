@@ -108,6 +108,42 @@ module.exports.delete = (apiKeyValue, apiSecret, totpUuid, callback) => {
   });
 };
 
+const getTotpRecord = (uuid, apiKeyValue, callback) => {
+  const params = {
+    TableName: process.env.TOTP_TABLE_NAME,
+    Key: {
+      'uuid': {
+        S: uuid
+      }
+    },
+    ConditionExpression: 'apiKey = :apiKey',
+    ExpressionAttributeValues: {
+      ':apiKey': {
+        'S': apiKeyValue
+      }
+    }
+  };
+  
+  dynamoDb.get(params, (error, result) => {
+    if (error) {
+      console.error(error);
+      callback(new Error('Failed to retrieve that TOTP record.'));
+      return;
+    }
+    /* NOTE: Asking for a record that doesn't exist is NOT an error, you simply
+     *       get an empty result back.  */
+    
+    if (result.Item && (result.Item.apiKey !== apiKeyValue)) {
+      console.error('AWS ConditionExpression FAILED to limit TOTP record by apiKey value.');
+      callback(new Error('Failed to retrieve the correct TOTP record.'));
+      return;
+    }
+    
+    callback(null, result.Item);
+    return;
+  });
+};
+
 module.exports.validate = (apiKeyValue, apiSecret, totpUuid, code, callback) => {
   apiKey.getActivatedApiKey(apiKeyValue, apiSecret, (error, apiKeyRecord) => {
     if (error) {
@@ -127,42 +163,50 @@ module.exports.validate = (apiKeyValue, apiSecret, totpUuid, code, callback) => 
       return;
     }
     
-    if (!apiKeyRecord.totp || !apiKeyRecord.totp[totpUuid]) {
-      console.log('API Key has no such TOTP uuid.');
-      response.returnError(401, 'Unauthorized', callback);
-      return;
-    }
-    
-    const encryptedTotpKey = apiKeyRecord.totp[totpUuid].encryptedTotpKey;
-    if (!encryptedTotpKey) {
-      console.error('No encryptedTotpKey found in that TOTP record.');
-      response.returnError(500, 'Internal Server Error', callback);
-      return;
-    }
-    
-    encryption.decrypt(encryptedTotpKey, apiSecret, (error, totpKey) => {
+    getTotpRecord(totpUuid, apiKeyValue, (totpRecord, error) => {
       if (error) {
-        console.error('Error validating TOTP code.', error);
+        console.error('Error while getting TOTP record for validating a code.', error);
         response.returnError(500, 'Internal Server Error', callback);
         return;
       }
       
-      const isValid = speakeasy.totp.verify({
-        secret: totpKey,
-        encoding: 'base32',
-        token: code,
-        window: 1 // 1 means compare against previous, current, and next.
-      });
-      
-      if (!isValid) {
-        console.log('Invalid TOTP code.');
-        response.returnError(401, 'Invalid', callback);
+      if (!totpRecord || (totpRecord.apiKey !== apiKeyValue)) {
+        console.log('API Key has no such TOTP uuid.');
+        response.returnError(401, 'Unauthorized', callback);
         return;
       }
       
-      console.log('Valid TOTP code.');
-      response.returnSuccess({'message': 'Valid', 'status': 200}, callback);
-      return;
+      const encryptedTotpKey = totpRecord.encryptedTotpKey;
+      if (!encryptedTotpKey) {
+        console.error('No encryptedTotpKey found in that TOTP record.');
+        response.returnError(500, 'Internal Server Error', callback);
+        return;
+      }
+      
+      encryption.decrypt(encryptedTotpKey, apiSecret, (error, totpKey) => {
+        if (error) {
+          console.error('Error validating TOTP code.', error);
+          response.returnError(500, 'Internal Server Error', callback);
+          return;
+        }
+        
+        const isValid = speakeasy.totp.verify({
+          secret: totpKey,
+          encoding: 'base32',
+          token: code,
+          window: 1 // 1 means compare against previous, current, and next.
+        });
+        
+        if (!isValid) {
+          console.log('Invalid TOTP code.');
+          response.returnError(401, 'Invalid', callback);
+          return;
+        }
+        
+        console.log('Valid TOTP code.');
+        response.returnSuccess({'message': 'Valid', 'status': 200}, callback);
+        return;
+      });
     });
   });
 };
