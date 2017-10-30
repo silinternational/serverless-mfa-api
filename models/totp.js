@@ -145,9 +145,7 @@ const getTotpRecord = (uuid, apiKeyValue, callback) => {
     },
     ConditionExpression: 'apiKey = :apiKey',
     ExpressionAttributeValues: {
-      ':apiKey': {
-        'S': apiKeyValue
-      }
+      ':apiKey': apiKeyValue
     }
   };
   
