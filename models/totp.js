@@ -69,7 +69,10 @@ const createNewTotpRecord = (totpRecord, callback) => {
   const params = {
     TableName: process.env.TOTP_TABLE_NAME,
     Item: totpRecord,
-    ConditionExpression : 'attribute_not_exists(uuid)'
+    ConditionExpression : 'attribute_not_exists(#u)',
+    ExpressionAttributeNames: {
+      '#u': 'uuid'
+    }
   };
   
   dynamoDb.put(params, callback);
@@ -124,7 +127,10 @@ const deleteTotpRecord = (totpRecord, callback) => {
         S: totpRecord.uuid
       }
     },
-    ConditionExpression: 'attribute_exists(uuid) AND apiKey = :apiKey',
+    ConditionExpression: 'attribute_exists(#u) AND apiKey = :apiKey',
+    ExpressionAttributeNames: {
+      '#u': 'uuid'
+    },
     ExpressionAttributeValues: {
       ':apiKey': {
         'S': totpRecord.apiKey
