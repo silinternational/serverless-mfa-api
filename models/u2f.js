@@ -303,7 +303,7 @@ module.exports.validateRegistration = (apiKeyValue, apiSecret, u2fUuid, {signRes
   console.log('Begin validating registration for uuid: ' + u2fUuid);
   apiKey.getActivatedApiKey(apiKeyValue, apiSecret, (error, apiKeyRecord) => {
     if (error) {
-      console.log('Unable to get activated API Key in order to validate U2F authentication:', error);
+      console.log('Unable to get activated API Key in order to validate U2F registration:', error);
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
@@ -313,52 +313,57 @@ module.exports.validateRegistration = (apiKeyValue, apiSecret, u2fUuid, {signRes
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
-
-    if (!apiKeyRecord.u2f || !apiKeyRecord.u2f[u2fUuid]) {
-      console.log('API Key has no such U2F uuid.');
-      response.returnError(404, 'No U2F entry found with that uuid for that API Key.', callback);
-      return;
-    }
-
-    const encryptedRegistrationRequest = apiKeyRecord.u2f[u2fUuid].encryptedRegistrationRequest;
-    if (!encryptedRegistrationRequest) {
-      console.error('No encryptedRegistrationRequest found in that U2F record.');
-      response.returnError(500, 'Internal Server Error', callback);
-      return;
-    }
-
-    encryption.decrypt(encryptedRegistrationRequest, apiSecret, (error, registrationRequest) => {
+    
+    getU2fRecord(u2fUuid, apiKeyValue, (error, u2fRecord) => {
       if (error) {
-        console.error('Error validating registrationRequest', error);
+        console.error('Error while getting U2F record for validating a registration.', error);
+        response.returnError(500, 'Internal Server Error', callback);
+        return;
+      }
+      
+      if (!u2fRecord || (u2fRecord.apiKey !== apiKeyValue)) {
+        console.log('API Key has no such U2F uuid.');
+        response.returnError(404, 'No U2F record found with that uuid for that API Key.', callback);
+        return;
+      }
+      
+      const encryptedRegistrationRequest = u2fRecord.encryptedRegistrationRequest;
+      if (!encryptedRegistrationRequest) {
+        console.error('No encryptedRegistrationRequest found in that U2F record.');
         response.returnError(500, 'Internal Server Error', callback);
         return;
       }
 
-      const result = u2f.checkRegistration(JSON.parse(registrationRequest), signResult);
-      if (result.errorMessage) {
-        console.error('U2F check registration failed. Error: ' + result.errorMessage);
-        response.returnError(500, 'Internal Server Error', callback);
-        return;
-      }
-
-      apiKeyRecord.u2f[u2fUuid].encryptedRegistrationRequest = null;
-      apiKeyRecord.u2f[u2fUuid].encryptedPublicKey = encryption.encrypt(result.publicKey, apiSecret);
-      apiKeyRecord.u2f[u2fUuid].encryptedKeyHandle = encryption.encrypt(result.keyHandle, apiSecret);
-
-      apiKey.updateApiKeyRecord(apiKeyRecord, (error) => {
+      encryption.decrypt(encryptedRegistrationRequest, apiSecret, (error, registrationRequest) => {
         if (error) {
-          console.error('Error while updating U2F entry after validating registration', error);
+          console.error('Error decrypting registrationRequest', error);
           response.returnError(500, 'Internal Server Error', callback);
           return;
         }
 
-        console.log('Successfully validated U2F registration for uuid: ' + u2fUuid);
-        response.returnSuccess(null, callback);
-        return;
+        const result = u2f.checkRegistration(JSON.parse(registrationRequest), signResult);
+        if (result.errorMessage) {
+          console.error('U2F check registration failed. Error: ' + result.errorMessage);
+          response.returnError(500, 'Internal Server Error', callback);
+          return;
+        }
+
+        delete u2fRecord.encryptedRegistrationRequest;
+        u2fRecord.encryptedPublicKey = encryption.encrypt(result.publicKey, apiSecret);
+        u2fRecord.encryptedKeyHandle = encryption.encrypt(result.keyHandle, apiSecret);
+
+        updateU2fRecord(u2fRecord, (error) => {
+          if (error) {
+            console.error('Error while updating U2F record after validating registration', error);
+            response.returnError(500, 'Internal Server Error', callback);
+            return;
+          }
+
+          console.log('Successfully validated U2F registration for uuid: ' + u2fUuid);
+          response.returnSuccess(null, callback);
+          return;
+        });
       });
-
     });
-
   });
-
 };
