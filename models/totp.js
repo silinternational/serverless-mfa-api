@@ -1,6 +1,8 @@
 'use strict';
 
 const apiKey = require('../models/api-key.js');
+const AWS = require('aws-sdk');
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const encryption = require('../helpers/encryption.js');
 const password = require('../helpers/password.js');
 const qrCode = require('qrcode');
