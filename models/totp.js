@@ -87,25 +87,50 @@ module.exports.delete = (apiKeyValue, apiSecret, totpUuid, callback) => {
       return;
     }
     
-    if (!apiKeyRecord.totp || !apiKeyRecord.totp[totpUuid]) {
-      console.log('API Key has no such TOTP uuid.');
-      response.returnError(404, 'No TOTP entry found with that uuid for that API Key.', callback);
-      return;
-    }
-    
-    delete apiKeyRecord.totp[totpUuid];
-    
-    apiKey.updateApiKeyRecord(apiKeyRecord, (error) => {
+    getTotpRecord(totpUuid, apiKeyValue, (totpRecord, error) => {
       if (error) {
-        console.error('Error while deleting TOTP entry.', error);
+        console.error('Error while getting TOTP to be deleted.', error);
         response.returnError(500, 'Internal Server Error', callback);
         return;
       }
       
-      response.returnSuccess(null, callback);
-      return;
+      if (!totpRecord || (totpRecord.apiKey !== apiKeyValue)) {
+        console.log('API Key has no such TOTP uuid.');
+        response.returnError(404, 'No TOTP entry found with that uuid for that API Key.', callback);
+        return;
+      }
+      
+      deleteTotpRecord(totpRecord, (error) => {
+        if (error) {
+          console.error('Error while deleting TOTP record.', error);
+          response.returnError(500, 'Internal Server Error', callback);
+          return;
+        }
+        
+        response.returnSuccess(null, callback);
+        return;
+      });
     });
   });
+};
+
+const deleteTotpRecord = (totpRecord, callback) => {
+  const params = {
+    TableName: process.env.TOTP_TABLE_NAME,
+    Key: {
+      'uuid': {
+        S: totpRecord.uuid
+      }
+    },
+    ConditionExpression: 'attribute_exists(uuid) AND apiKey = :apiKey',
+    ExpressionAttributeValues: {
+      ':apiKey': {
+        'S': totpRecord.apiKey
+      }
+    }
+  };
+  
+  dynamoDb.delete(params, callback);
 };
 
 const getTotpRecord = (uuid, apiKeyValue, callback) => {
