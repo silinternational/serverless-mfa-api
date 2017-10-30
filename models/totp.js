@@ -123,9 +123,7 @@ const deleteTotpRecord = (totpRecord, callback) => {
   const params = {
     TableName: process.env.TOTP_TABLE_NAME,
     Key: {
-      'uuid': {
-        S: totpRecord.uuid
-      }
+      'uuid': totpRecord.uuid
     },
     ConditionExpression: 'attribute_exists(#u) AND apiKey = :apiKey',
     ExpressionAttributeNames: {
@@ -145,9 +143,7 @@ const getTotpRecord = (uuid, apiKeyValue, callback) => {
   const params = {
     TableName: process.env.TOTP_TABLE_NAME,
     Key: {
-      'uuid': {
-        S: uuid
-      }
+      'uuid': uuid
     },
     ConditionExpression: 'apiKey = :apiKey',
     ExpressionAttributeValues: {
