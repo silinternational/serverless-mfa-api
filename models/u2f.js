@@ -1,6 +1,8 @@
 'use strict';
 
 const apiKey = require('../models/api-key.js');
+const AWS = require('aws-sdk');
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const encryption = require('../helpers/encryption.js');
 const response = require('../helpers/response.js');
 const u2f = require('u2f');
@@ -84,6 +86,19 @@ module.exports.createAuthentication = (apiKeyValue, apiSecret, u2fUuid, callback
   });
 };
 
+const createNewU2fRecord = (u2fRecord, callback) => {
+  const params = {
+    TableName: process.env.U2F_TABLE_NAME,
+    Item: u2fRecord,
+    ConditionExpression : 'attribute_not_exists(#u)',
+    ExpressionAttributeNames: {
+      '#u': 'uuid'
+    }
+  };
+  
+  dynamoDb.put(params, callback);
+};
+
 module.exports.createRegistration = (apiKeyValue, apiSecret, {appId} = {}, callback) => {
   console.log('Begin creating U2F registration');
   apiKey.getActivatedApiKey(apiKeyValue, apiSecret, (error, apiKeyRecord) => {
@@ -95,19 +110,16 @@ module.exports.createRegistration = (apiKeyValue, apiSecret, {appId} = {}, callb
 
     const registrationRequest = u2f.request(appId);
 
-    var u2fUuid = uuid.v4();
-    apiKeyRecord.u2f = apiKeyRecord.u2f || {};
-    while (apiKeyRecord.u2f[u2fUuid]) {
-      console.log('Initial UUID was already in use. Generating a new one.');
-      u2fUuid = uuid.v4();
-    }
-    apiKeyRecord.u2f[u2fUuid] = {
+    const u2fUuid = uuid.v4();
+    const u2fRecord = {
+      'uuid': u2fUuid,
+      'apiKey': apiKeyValue,
       'encryptedAppId': encryption.encrypt(appId, apiSecret),
       'encryptedRegistrationRequest': encryption.encrypt(JSON.stringify(registrationRequest), apiSecret)
     };
-    apiKey.updateApiKeyRecord(apiKeyRecord, (error) => {
+    createNewU2fRecord(u2fRecord, (error) => {
       if (error) {
-        console.error('Failed to create new U2F entry.', error);
+        console.error('Failed to create new U2F record.', error);
         response.returnError(500, 'Internal Server Error', callback);
         return;
       }
