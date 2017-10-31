@@ -242,61 +242,65 @@ module.exports.validateAuthentication = (apiKeyValue, apiSecret, u2fUuid, {signR
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
-
-    if (!apiKeyRecord.u2f || !apiKeyRecord.u2f[u2fUuid]) {
-      console.log('API Key has no such U2F uuid.');
-      response.returnError(404, 'No U2F entry found with that uuid for that API Key.', callback);
-      return;
-    }
-
-    const encryptedAuthenticationRequest = apiKeyRecord.u2f[u2fUuid].encryptedAuthenticationRequest;
-    if (!encryptedAuthenticationRequest) {
-      console.error('No encryptedAuthenticationRequest found in that U2F record.');
-      response.returnError(500, 'Internal Server Error', callback);
-      return;
-    }
-
-    encryption.decrypt(encryptedAuthenticationRequest, apiSecret, (error, authenticationRequest) => {
+    
+    getU2fRecord(u2fUuid, apiKeyValue, (error, u2fRecord) => {
       if (error) {
-        console.error('Error validating authenticationRequest', error);
+        console.error('Error while getting U2F record to validate U2F authentication:', error);
+        response.returnError(500, 'Internal Server Error', callback);
+        return;
+      }
+      
+      if (!u2fRecord || (u2fRecord.apiKey !== apiKeyValue)) {
+        console.log('API Key has no such U2F uuid.');
+        response.returnError(404, 'No U2F record found with that uuid for that API Key.', callback);
+        return;
+      }
+      
+      const encryptedAuthenticationRequest = u2fRecord.encryptedAuthenticationRequest;
+      if (!encryptedAuthenticationRequest) {
+        console.error('No encryptedAuthenticationRequest found in that U2F record.');
         response.returnError(500, 'Internal Server Error', callback);
         return;
       }
 
-      const encryptedPublicKey = apiKeyRecord.u2f[u2fUuid].encryptedPublicKey;
-      if (!encryptedPublicKey) {
-        console.error('No encryptedPublicKey found in that U2F record.');
-        response.returnError(500, 'Internal Server Error', callback);
-        return;
-      }
-
-      encryption.decrypt(encryptedPublicKey, apiSecret, (error, publicKey) => {
-        const result = u2f.checkSignature(JSON.parse(authenticationRequest), signResult, publicKey);
-        if (result.errorMessage) {
-          console.error('Error validating U2F authentication. Error: ' + result.errorMessage);
-          response.returnError(400, result.errorMessage, callback);
+      encryption.decrypt(encryptedAuthenticationRequest, apiSecret, (error, authenticationRequest) => {
+        if (error) {
+          console.error('Error decrypting authenticationRequest to validate U2F authentication:', error);
+          response.returnError(500, 'Internal Server Error', callback);
           return;
         }
 
-        apiKeyRecord.u2f[u2fUuid].encryptedAuthenticationRequest = ' ';
-        apiKey.updateApiKeyRecord(apiKeyRecord, (error) => {
-          if (error) {
-            console.error('Unable to unset encryptedAuthenticationRequest after successful authentication');
-            response.returnError(500, 'Internal Server Error', callback);
+        const encryptedPublicKey = u2fRecord.encryptedPublicKey;
+        if (!encryptedPublicKey) {
+          console.error('No encryptedPublicKey found in that U2F record.');
+          response.returnError(500, 'Internal Server Error', callback);
+          return;
+        }
+
+        encryption.decrypt(encryptedPublicKey, apiSecret, (error, publicKey) => {
+          const result = u2f.checkSignature(JSON.parse(authenticationRequest), signResult, publicKey);
+          if (result.errorMessage) {
+            console.error('Error validating U2F authentication. Error: ' + result.errorMessage);
+            response.returnError(400, result.errorMessage, callback);
             return;
           }
 
-          console.log('Successfully validated U2F authentication for uuid: ' + u2fUuid);
-          response.returnSuccess({'message': 'Valid', 'status': 200}, callback);
-          return;
+          delete u2fRecord.encryptedAuthenticationRequest;
+          updateU2fRecord(u2fRecord, (error) => {
+            if (error) {
+              console.error('Unable to unset encryptedAuthenticationRequest after successful authentication');
+              response.returnError(500, 'Internal Server Error', callback);
+              return;
+            }
+
+            console.log('Successfully validated U2F authentication for uuid: ' + u2fUuid);
+            response.returnSuccess({'message': 'Valid', 'status': 200}, callback);
+            return;
+          });
         });
-
       });
-
     });
-
   });
-
 };
 
 module.exports.validateRegistration = (apiKeyValue, apiSecret, u2fUuid, {signResult} = {}, callback) => {
