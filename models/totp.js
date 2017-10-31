@@ -69,7 +69,7 @@ const createNewTotpRecord = (totpRecord, callback) => {
   const params = {
     TableName: process.env.TOTP_TABLE_NAME,
     Item: totpRecord,
-    ConditionExpression : 'attribute_not_exists(#u)',
+    ConditionExpression: 'attribute_not_exists(#u)',
     ExpressionAttributeNames: {
       '#u': 'uuid'
     }
