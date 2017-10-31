@@ -68,11 +68,15 @@ module.exports.create = (email, callback) => {
   
   const apiKeyValue = crypto.randomBytes(20).toString('hex');
   const params = {
-    TableName: process.env.TABLE_NAME,
+    TableName: process.env.API_KEY_TABLE_NAME,
     Item: {
       createdAt: timestamp,
       email: email,
       value: apiKeyValue
+    },
+    ConditionExpression : 'attribute_not_exists(#v)',
+    ExpressionAttributeNames: {
+      '#v': 'value'
     }
   };
   
@@ -135,7 +139,7 @@ module.exports.getActivatedApiKey = (apiKeyValue, apiSecret, callback) => {
 
 const getApiKeyByValue = (value, callback) => {
   const params = {
-    TableName: process.env.TABLE_NAME,
+    TableName: process.env.API_KEY_TABLE_NAME,
     Key: {
       value: value
     }
@@ -154,7 +158,6 @@ const getApiKeyByValue = (value, callback) => {
     return;
   });
 };
-module.exports.getApiKeyByValue = getApiKeyByValue;
 
 const isAlreadyActivated = (apiKeyRecord) => {
   return Boolean(apiKeyRecord && apiKeyRecord.activatedAt);
@@ -186,7 +189,7 @@ module.exports.isValidApiSecret = isValidApiSecret;
 
 const updateApiKeyRecord = (apiKeyRecord, callback) => {
   const params = {
-    TableName: process.env.TABLE_NAME,
+    TableName: process.env.API_KEY_TABLE_NAME,
     Item: apiKeyRecord
   };
   
