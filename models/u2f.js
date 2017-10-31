@@ -146,7 +146,7 @@ module.exports.delete = (apiKeyValue, apiSecret, u2fUuid, callback) => {
   console.log('Begin deleting U2F for uuid: ' + u2fUuid);
   apiKey.getActivatedApiKey(apiKeyValue, apiSecret, (error, apiKeyRecord) => {
     if (error) {
-      console.log('Unable to get activated API Key in order to delete U2F:', error);
+      console.log('Unable to get activated API Key in order to delete U2F record:', error);
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
@@ -156,26 +156,54 @@ module.exports.delete = (apiKeyValue, apiSecret, u2fUuid, callback) => {
       response.returnError(401, 'Unauthorized', callback);
       return;
     }
-
-    if (!apiKeyRecord.u2f || !apiKeyRecord.u2f[u2fUuid]) {
-      console.log('API Key has no such U2F uuid.');
-      response.returnError(404, 'No U2F entry found with that uuid for that API Key.', callback);
-      return;
-    }
-
-    delete apiKeyRecord.u2f[u2fUuid];
-
-    apiKey.updateApiKeyRecord(apiKeyRecord, (error) => {
+    
+    getU2fRecord(u2fUuid, apiKeyValue, (error, u2fRecord) => {
       if (error) {
-        console.error('Error while deleting U2F entry.', error);
+        console.error('Error while getting U2F record in order to delete it:', error);
         response.returnError(500, 'Internal Server Error', callback);
         return;
       }
+      
+      if (!u2fRecord || (u2fRecord.apiKey !== apiKeyValue)) {
+        console.log('API Key has no such U2F uuid.');
+        response.returnError(404, 'No U2F record found with that uuid for that API Key.', callback);
+        return;
+      }
+      
+      deleteU2fRecord(u2fRecord, (error) => {
+        if (error) {
+          console.error('Error while deleting U2F record:', error);
+          response.returnError(500, 'Internal Server Error', callback);
+          return;
+        }
 
-      console.log('Successfully deleted U2F for uuid: ' + u2fUuid);
-      response.returnSuccess(null, callback);
-      return;
+        console.log('Successfully deleted U2F for uuid: ' + u2fUuid);
+        response.returnSuccess(null, callback);
+        return;
+      });
     });
+  });
+};
+
+const deleteU2fRecord = (u2fRecord, callback) => {
+  const params = {
+    TableName: process.env.U2F_TABLE_NAME,
+    Key: {
+      'uuid': u2fRecord.uuid
+    },
+    ConditionExpression: 'attribute_exists(#u) AND apiKey = :apiKey',
+    ExpressionAttributeNames: {
+      '#u': 'uuid'
+    },
+    ExpressionAttributeValues: {
+      ':apiKey': u2fRecord.apiKey
+    }
+  };
+  
+  dynamoDb.delete(params, (error) => {
+    // Only send our callback the (potential) error, rather than all of the
+    // parameters that dynamoDb.delete would send.
+    callback(error);
   });
 };
 
