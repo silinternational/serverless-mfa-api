@@ -1,6 +1,8 @@
 'use strict';
 
 const apiKey = require('../models/api-key.js');
+const AWS = require('aws-sdk');
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const encryption = require('../helpers/encryption.js');
 const password = require('../helpers/password.js');
 const qrCode = require('qrcode');
@@ -35,19 +37,17 @@ module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} =
         return;
       }
       
+      const totpUuid = uuid.v4();
       const totpKey = otpSecrets.base32;
-      var totpUuid = uuid.v4();
-      apiKeyRecord.totp = apiKeyRecord.totp || {};
-      while (apiKeyRecord.totp[totpUuid]) {
-        console.log('Initial UUID was already in use. Generating a new one.');
-        totpUuid = uuid.v4();
-      }
-      apiKeyRecord.totp[totpUuid] = {
+      const totpRecord = {
+        'uuid': totpUuid,
+        'apiKey': apiKeyValue,
         'encryptedTotpKey': encryption.encrypt(totpKey, apiSecret)
       };
-      apiKey.updateApiKeyRecord(apiKeyRecord, (error) => {
+      
+      createNewTotpRecord(totpRecord, (error) => {
         if (error) {
-          console.error('Failed to create new TOTP entry.', error);
+          console.error('Failed to create new TOTP record.', error);
           response.returnError(500, 'Internal Server Error', callback);
           return;
         }
@@ -65,6 +65,19 @@ module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} =
   });
 };
 
+const createNewTotpRecord = (totpRecord, callback) => {
+  const params = {
+    TableName: process.env.TOTP_TABLE_NAME,
+    Item: totpRecord,
+    ConditionExpression: 'attribute_not_exists(#u)',
+    ExpressionAttributeNames: {
+      '#u': 'uuid'
+    }
+  };
+  
+  dynamoDb.put(params, callback);
+};
+
 module.exports.delete = (apiKeyValue, apiSecret, totpUuid, callback) => {
   apiKey.getActivatedApiKey(apiKeyValue, apiSecret, (error, apiKeyRecord) => {
     if (error) {
@@ -79,24 +92,80 @@ module.exports.delete = (apiKeyValue, apiSecret, totpUuid, callback) => {
       return;
     }
     
-    if (!apiKeyRecord.totp || !apiKeyRecord.totp[totpUuid]) {
-      console.log('API Key has no such TOTP uuid.');
-      response.returnError(404, 'No TOTP entry found with that uuid for that API Key.', callback);
-      return;
-    }
-    
-    delete apiKeyRecord.totp[totpUuid];
-    
-    apiKey.updateApiKeyRecord(apiKeyRecord, (error) => {
+    getTotpRecord(totpUuid, apiKeyValue, (error, totpRecord) => {
       if (error) {
-        console.error('Error while deleting TOTP entry.', error);
+        console.error('Error while getting TOTP to be deleted.', error);
         response.returnError(500, 'Internal Server Error', callback);
         return;
       }
       
-      response.returnSuccess(null, callback);
-      return;
+      if (!totpRecord || (totpRecord.apiKey !== apiKeyValue)) {
+        console.log('API Key has no such TOTP uuid.');
+        response.returnError(404, 'No TOTP entry found with that uuid for that API Key.', callback);
+        return;
+      }
+      
+      deleteTotpRecord(totpRecord, (error) => {
+        if (error) {
+          console.error('Error while deleting TOTP record.', error);
+          response.returnError(500, 'Internal Server Error', callback);
+          return;
+        }
+        
+        response.returnSuccess(null, callback);
+        return;
+      });
     });
+  });
+};
+
+const deleteTotpRecord = (totpRecord, callback) => {
+  const params = {
+    TableName: process.env.TOTP_TABLE_NAME,
+    Key: {
+      'uuid': totpRecord.uuid
+    },
+    ConditionExpression: 'attribute_exists(#u) AND apiKey = :apiKey',
+    ExpressionAttributeNames: {
+      '#u': 'uuid'
+    },
+    ExpressionAttributeValues: {
+      ':apiKey': totpRecord.apiKey
+    }
+  };
+  
+  dynamoDb.delete(params, callback);
+};
+
+const getTotpRecord = (uuid, apiKeyValue, callback) => {
+  const params = {
+    TableName: process.env.TOTP_TABLE_NAME,
+    Key: {
+      'uuid': uuid
+    },
+    ConditionExpression: 'apiKey = :apiKey',
+    ExpressionAttributeValues: {
+      ':apiKey': apiKeyValue
+    }
+  };
+  
+  dynamoDb.get(params, (error, result) => {
+    if (error) {
+      console.error(error);
+      callback(new Error('Failed to retrieve that TOTP record.'));
+      return;
+    }
+    /* NOTE: Asking for a record that doesn't exist is NOT an error, you simply
+     *       get an empty result back.  */
+    
+    if (result.Item && (result.Item.apiKey !== apiKeyValue)) {
+      console.error('AWS ConditionExpression FAILED to limit TOTP record by apiKey value.');
+      callback(new Error('Failed to retrieve the correct TOTP record.'));
+      return;
+    }
+    
+    callback(null, result.Item);
+    return;
   });
 };
 
@@ -119,42 +188,50 @@ module.exports.validate = (apiKeyValue, apiSecret, totpUuid, code, callback) => 
       return;
     }
     
-    if (!apiKeyRecord.totp || !apiKeyRecord.totp[totpUuid]) {
-      console.log('API Key has no such TOTP uuid.');
-      response.returnError(401, 'Unauthorized', callback);
-      return;
-    }
-    
-    const encryptedTotpKey = apiKeyRecord.totp[totpUuid].encryptedTotpKey;
-    if (!encryptedTotpKey) {
-      console.error('No encryptedTotpKey found in that TOTP record.');
-      response.returnError(500, 'Internal Server Error', callback);
-      return;
-    }
-    
-    encryption.decrypt(encryptedTotpKey, apiSecret, (error, totpKey) => {
+    getTotpRecord(totpUuid, apiKeyValue, (error, totpRecord) => {
       if (error) {
-        console.error('Error validating TOTP code.', error);
+        console.error('Error while getting TOTP record for validating a code.', error);
         response.returnError(500, 'Internal Server Error', callback);
         return;
       }
       
-      const isValid = speakeasy.totp.verify({
-        secret: totpKey,
-        encoding: 'base32',
-        token: code,
-        window: 1 // 1 means compare against previous, current, and next.
-      });
-      
-      if (!isValid) {
-        console.log('Invalid TOTP code.');
-        response.returnError(401, 'Invalid', callback);
+      if (!totpRecord || (totpRecord.apiKey !== apiKeyValue)) {
+        console.log('API Key has no such TOTP uuid.');
+        response.returnError(401, 'Unauthorized', callback);
         return;
       }
       
-      console.log('Valid TOTP code.');
-      response.returnSuccess({'message': 'Valid', 'status': 200}, callback);
-      return;
+      const encryptedTotpKey = totpRecord.encryptedTotpKey;
+      if (!encryptedTotpKey) {
+        console.error('No encryptedTotpKey found in that TOTP record.');
+        response.returnError(500, 'Internal Server Error', callback);
+        return;
+      }
+      
+      encryption.decrypt(encryptedTotpKey, apiSecret, (error, totpKey) => {
+        if (error) {
+          console.error('Error validating TOTP code.', error);
+          response.returnError(500, 'Internal Server Error', callback);
+          return;
+        }
+        
+        const isValid = speakeasy.totp.verify({
+          secret: totpKey,
+          encoding: 'base32',
+          token: code,
+          window: 1 // 1 means compare against previous, current, and next.
+        });
+        
+        if (!isValid) {
+          console.log('Invalid TOTP code.');
+          response.returnError(401, 'Invalid', callback);
+          return;
+        }
+        
+        console.log('Valid TOTP code.');
+        response.returnSuccess({'message': 'Valid', 'status': 200}, callback);
+        return;
+      });
     });
   });
 };
