@@ -1,5 +1,5 @@
 {
-  "name": "totp-api",
+  "name": "serverless-mfa-api",
   "description": "A Serverless API for registering and validating Multi-Factor Authentication methods. Currently supports Time-based One Time Passwords (TOTP) and FIDO U2F devices (YubiKeys).",
   "dependencies": {
     "aws-sdk": "^2.110.0",
@@ -16,7 +16,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/silinternational/totp-api"
+    "url": "https://github.com/silinternational/serverless-mfa-api"
   },
   "scripts": {
     "test": "cucumberjs"
