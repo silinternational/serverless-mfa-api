@@ -2,7 +2,7 @@
   "name": "serverless-mfa-api",
   "description": "A Serverless API for registering and validating Multi-Factor Authentication methods. Currently supports Time-based One Time Passwords (TOTP) and FIDO U2F devices (YubiKeys).",
   "dependencies": {
-    "aws-sdk": "^2.110.0",
+    "aws-sdk": "^2.149.0",
     "bcryptjs": "^2.4.3",
     "crypto-js": "^3.1.9-1",
     "qrcode": "^0.9.0",
@@ -23,6 +23,6 @@
   },
   "devDependencies": {
     "assert": "^1.4.1",
-    "cucumber": "^3.0.3"
+    "cucumber": "^3.1.0"
   }
 }
