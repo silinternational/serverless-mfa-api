@@ -1,5 +1,5 @@
 Feature: Encryption
-  As a developer of totp-api
+  As a developer of mfa-api
   I want to be able to encrypt and decrypt text
   So that I can store and retrieve sensitive information
 

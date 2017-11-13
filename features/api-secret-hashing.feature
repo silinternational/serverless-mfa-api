@@ -1,5 +1,5 @@
 Feature: API Secret hashing
-  As a developer of totp-api
+  As a developer of mfa-api
   I want to store a one-way hash of an API Key's secret
   So that I can check a given API Secret against it later
   
