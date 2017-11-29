@@ -163,8 +163,10 @@ protocols: [HTTPS]
           204:
           400:
             description: |
-              The request body was invlalid, such as if no `code` value was found.
+              The request body was invalid, such as if no `code` value was found.
           401:
+            description: |
+              The given TOTP code was wrong.
           404:
 
 /u2f:
