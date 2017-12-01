@@ -20,13 +20,17 @@ module.exports.create = (apiKeyValue, apiSecret, {issuer, label = 'SecretKey'} =
     
     const otpSecrets = speakeasy.generateSecret({length: 10});
     let otpAuthUrlOptions = {
-      'label': label,
+      'label': encodeURIComponent(label),
       'secret': otpSecrets.base32,
       'encoding': 'base32'
     };
     if (issuer) {
       otpAuthUrlOptions.issuer = issuer;
-      otpAuthUrlOptions.label = issuer + ':' + label;
+      
+      // Note: The issuer and account-name used in the `label` need to be
+      // URL-encoded. Presumably speakeasy doesn't automatically do so because
+      // the colon (:) separating them needs to NOT be encoded.
+      otpAuthUrlOptions.label = encodeURIComponent(issuer) + ':' + encodeURIComponent(label);
     }
     
     const otpAuthUrl = speakeasy.otpauthURL(otpAuthUrlOptions);
