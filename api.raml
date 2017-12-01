@@ -160,11 +160,15 @@ protocols: [HTTPS]
             example: |
               {"code": "012345"}
         responses:
-          204:
+          200:
+            description: |
+              The given TOTP code was valid.
           400:
             description: |
-              The request body was invlalid, such as if no `code` value was found.
+              The request body was invalid, such as if no `code` value was found.
           401:
+            description: |
+              The given TOTP code was wrong.
           404:
 
 /u2f:
