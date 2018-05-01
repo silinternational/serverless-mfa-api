@@ -197,14 +197,12 @@ here, further restrict statements by IP CIDR, restrict S3 paths, etc.
 ```
 
 Once you have the shevchenkos/DynamoDbBackUp software set up on your computer,
-you can use commands like the following to set up your automated backups. Note
-that, for readability, we have added line-breaks to the following commands, but
-you should remove them if running these commands yourself).
+you can use commands like the following to set up your automated backups.
 
 **Create the S3 bucket:**
 ```
-gulp deploy-s3-bucket
-    --s3bucket yourorg.backups.dynamodb.mfa-api
+gulp deploy-s3-bucket \
+    --s3bucket yourorg.backups.dynamodb.mfa-api \
     --s3region us-east-1
 ```
 (Note: Some of these commands, including the one above, had to be run twice to
@@ -215,48 +213,48 @@ to run the following commands once for each of the production tables (currently 
 
 **Set up the Lambda function for backing up changes:**
 ```
-gulp deploy-lambda
-    --s3bucket yourorg.backups.dynamodb.mfa-api
-    --s3prefix mfa-api_prod_api-key
-    --s3region us-east-1
-    --dbregion us-east-1
-    --lName backup_dynamodb_mfa-api_prod_api-key
-    --lRegion us-east-1
-    --lAlias active
-    --lRoleName LambdaBackupDynamoDBToS3
+gulp deploy-lambda \
+    --s3bucket yourorg.backups.dynamodb.mfa-api \
+    --s3prefix mfa-api_prod_api-key \
+    --s3region us-east-1 \
+    --dbregion us-east-1 \
+    --lName backup_dynamodb_mfa-api_prod_api-key \
+    --lRegion us-east-1 \
+    --lAlias active \
+    --lRoleName LambdaBackupDynamoDBToS3 \
     --lTimeout 60
 ```
 
 **Set up the event to trigger the Lambda function when a specific DynamoDB
 table is changed:**
 ```
-gulp deploy-lambda-event
-    --dbtable mfa-api_prod_api-key
-    --dbregion us-east-1
-    --lName backup_dynamodb_mfa-api_prod_api-key
-    --lRegion us-east-1
+gulp deploy-lambda-event \
+    --dbtable mfa-api_prod_api-key \
+    --dbregion us-east-1 \
+    --lName backup_dynamodb_mfa-api_prod_api-key \
+    --lRegion us-east-1 \
     --lAlias active
 ```
 
 **Do an initial full backup:**
 ```
-gulp backup-full
-    --s3bucket yourorg.backups.dynamodb.mfa-api
-    --s3prefix mfa-api_prod_api-key
-    --s3region us-east-1
-    --dbtable mfa-api_prod_api-key
+gulp backup-full \
+    --s3bucket yourorg.backups.dynamodb.mfa-api \
+    --s3prefix mfa-api_prod_api-key \
+    --s3region us-east-1 \
+    --dbtable mfa-api_prod_api-key \
     --dbregion us-east-1
 ```
 
 If you want to **do a restore** to a specific point in time (in this example,
 Thu, 25 Jan 2018 22:10:00 GMT), you would run the following:
 ```
-gulp restore
-    --s3bucket yourorg.backups.dynamodb.mfa-api
-    --s3prefix mfa-api_prod_totp
-    --s3region us-east-1
-    --dbtable mfa-api_prod_totp
-    --dbregion us-east-1
+gulp restore \
+    --s3bucket yourorg.backups.dynamodb.mfa-api \
+    --s3prefix mfa-api_prod_totp \
+    --s3region us-east-1 \
+    --dbtable mfa-api_prod_totp \
+    --dbregion us-east-1 \
     --restoretime 1516918200000
 ```
 (Note: The restore time is a JavaScript timestamp, in milliseconds.)
