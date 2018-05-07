@@ -87,6 +87,178 @@ To set this up on Codeship, do the following:
   with the credentials of the AWS IAM user that Serverless (running on Codeship)
   should act as when deploying this API.
 
+## Automated Backups ##
+While DynamoDB supports On Demand backups as well as Continuous Backups with
+Point-in-time Recovery (PITR), both of these methods restore to a new table
+rather than restoring to the existing DynamoDB table. While turning on
+Point-in-time Recovery is certainly not a bad idea, we have ended up using an
+alternate approach to make restores easier.
+
+The [shevchenkos/DynamoDbBackUp](https://github.com/shevchenkos/DynamoDbBackUp)
+software sets up Lambda functions that are triggered each time the associated
+DynamoDB table is changed, and it backs up the records to an S3 bucket. We used
+it to set up automated backups for each of the DynamoDB tables used by this
+repo.
+
+For the shevchenkos/DynamoDbBackUp software to be able to make the necessary
+changes in your AWS account, you will need to set up an IAM user with an Access
+Key and Secret and with a policy similar to the following. Note that you will
+need to replace `YOUR IP ADDRESS BLOCK CIDR` with a real value (for the IP
+address or range of addresses from which you want the following commands to
+allowed). You may also want to narrow down the breadth of permissions granted
+here, further restrict statements by IP CIDR, restrict S3 paths, etc.
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "iam:CreateRole",
+            "Resource": "arn:aws:iam::*:role/*"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": "iam:*",
+            "Resource": "arn:aws:iam::*:role/LambdaBackupDynamoDBToS3",
+            "Condition": {
+                "IpAddress": {
+                    "aws:SourceIp": "YOUR IP ADDRESS BLOCK CIDR"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:*"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:*"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:AttachRolePolicy",
+                "iam:CreatePolicy",
+                "iam:CreateRole",
+                "iam:DeleteRole",
+                "iam:DeleteRolePolicy",
+                "iam:GetRole",
+                "iam:PassRole",
+                "iam:PutRolePolicy"
+            ],
+            "Resource": [
+                "arn:aws:iam:::*",
+                "arn:aws:iam:::role/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "lambda:*"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:*"
+            ],
+            "Resource": [
+                "arn:aws:logs:*::log-group:*:log-stream:"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:*"
+            ],
+            "Resource": [
+                "arn:aws:s3:::*",
+                "arn:aws:s3:::*/*"
+            ]
+        }
+    ]
+}
+```
+
+Once you have the shevchenkos/DynamoDbBackUp software set up on your computer,
+you can use commands like the following to set up your automated backups.
+
+**Create the S3 bucket:**
+```
+gulp deploy-s3-bucket \
+    --s3bucket yourorg.backups.dynamodb.mfa-api \
+    --s3region us-east-1
+```
+(Note: Some of these commands, including the one above, had to be run twice to
+get past an apparent race condition.)
+
+If actually setting up these backups for your use of this library, you will need
+to run the following commands once for each of the production tables (currently `mfa-api_prod_api-key`, `mfa-api_prod_totp`, and `mfa-api_prod_u2f`)
+
+**Set up the Lambda function for backing up changes:**
+```
+gulp deploy-lambda \
+    --s3bucket yourorg.backups.dynamodb.mfa-api \
+    --s3prefix mfa-api_prod_api-key \
+    --s3region us-east-1 \
+    --dbregion us-east-1 \
+    --lName backup_dynamodb_mfa-api_prod_api-key \
+    --lRegion us-east-1 \
+    --lAlias active \
+    --lRoleName LambdaBackupDynamoDBToS3 \
+    --lTimeout 60
+```
+
+**Set up the event to trigger the Lambda function when a specific DynamoDB
+table is changed:**
+```
+gulp deploy-lambda-event \
+    --dbtable mfa-api_prod_api-key \
+    --dbregion us-east-1 \
+    --lName backup_dynamodb_mfa-api_prod_api-key \
+    --lRegion us-east-1 \
+    --lAlias active
+```
+
+**Do an initial full backup:**
+```
+gulp backup-full \
+    --s3bucket yourorg.backups.dynamodb.mfa-api \
+    --s3prefix mfa-api_prod_api-key \
+    --s3region us-east-1 \
+    --dbtable mfa-api_prod_api-key \
+    --dbregion us-east-1
+```
+
+If you want to **do a restore** to a specific point in time (in this example,
+Thu, 25 Jan 2018 22:10:00 GMT), you would run the following:
+```
+gulp restore \
+    --s3bucket yourorg.backups.dynamodb.mfa-api \
+    --s3prefix mfa-api_prod_totp \
+    --s3region us-east-1 \
+    --dbtable mfa-api_prod_totp \
+    --dbregion us-east-1 \
+    --restoretime 1516918200000
+```
+(Note: The restore time is a JavaScript timestamp, in milliseconds.)
+
 ## Glossary
 
 - `API Key`: A hex string used to identify calls to most of the endpoints on
