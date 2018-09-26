@@ -94,11 +94,13 @@ rather than restoring to the existing DynamoDB table. While turning on
 Point-in-time Recovery is certainly not a bad idea, we have ended up using an
 alternate approach to make restores easier.
 
-The [shevchenkos/DynamoDbBackUp](https://github.com/shevchenkos/DynamoDbBackUp)
+The **[shevchenkos/DynamoDbBackUp](https://github.com/shevchenkos/DynamoDbBackUp)**
 software sets up Lambda functions that are triggered each time the associated
 DynamoDB table is changed, and it backs up the records to an S3 bucket. We used
 it to set up automated backups for each of the DynamoDB tables used by this
-repo.
+repo. We also forked it (to https://github.com/silinternational/DynamoDbBackUp)
+in case the original "shevchenkos/DynamoDbBackUp" repo is ever deleted, but if
+the original repo is available use it, as it will more likely be up-to-date.
 
 For the shevchenkos/DynamoDbBackUp software to be able to make the necessary
 changes in your AWS account, you will need to set up an IAM user with an Access
