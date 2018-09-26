@@ -19,7 +19,7 @@
     "url": "https://github.com/silinternational/serverless-mfa-api"
   },
   "scripts": {
-    "test": "cucumberjs"
+    "test": "cucumber-js"
   },
   "devDependencies": {
     "assert": "^1.4.1",
