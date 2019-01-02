@@ -154,9 +154,7 @@ resources:
           -
             AttributeName: value
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+        BillingMode: PAY_PER_REQUEST
         TableName: '${self:custom.apiKeyTable}'
     TotpDynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
@@ -170,9 +168,7 @@ resources:
           -
             AttributeName: uuid
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+        BillingMode: PAY_PER_REQUEST
         TableName: '${self:custom.totpTable}'
     U2fDynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
@@ -186,9 +182,7 @@ resources:
           -
             AttributeName: uuid
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+        BillingMode: PAY_PER_REQUEST
         TableName: '${self:custom.u2fTable}'
     ApiKeyActivateLogGroup:
       Properties:
