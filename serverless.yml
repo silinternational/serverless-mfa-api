@@ -147,12 +147,10 @@ resources:
       DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
-          -
-            AttributeName: value
+          - AttributeName: value
             AttributeType: S
         KeySchema:
-          -
-            AttributeName: value
+          - AttributeName: value
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 5
@@ -163,12 +161,10 @@ resources:
       DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
-          -
-            AttributeName: uuid
+          - AttributeName: uuid
             AttributeType: S
         KeySchema:
-          -
-            AttributeName: uuid
+          - AttributeName: uuid
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 5
@@ -179,12 +175,10 @@ resources:
       DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
-          -
-            AttributeName: uuid
+          - AttributeName: uuid
             AttributeType: S
         KeySchema:
-          -
-            AttributeName: uuid
+          - AttributeName: uuid
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 5
