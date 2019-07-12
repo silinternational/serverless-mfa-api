@@ -43,7 +43,7 @@ For details about the various API endpoints, see
   the user presses the button on the device.
 - Pressing the button will trigger the callback method provided to the `u2f.register()`
   call which should pass the response object to the consumer's service, which in turn
-  can make a `PUT` call to `/mfa/{uuid}` with a JSON body including a property named
+  can make a `PUT` call to `/u2f/{uuid}` with a JSON body including a property named
   `signResult` with a value of the object returned from the U2F device.
 - We will validate the response and store the `keyHandle` and `publicKey` encrypted by
   the consumer's API Secret and respond with a success or error message.
@@ -57,7 +57,7 @@ For details about the various API endpoints, see
   the user presses the button on the device.
 - Pressing the button will trigger the callback method provided to the `u2f.sign()`
   call which should pass the response object to the consumer's service, which in turn
-  can make a `PUT` call to `/mfa/{uuid}/auth` with a JSON body including a property named
+  can make a `PUT` call to `/u2f/{uuid}/auth` with a JSON body including a property named
   `signResult` with a value of the object returned from the U2F device.
 - We will validate the signResult and respond with a success or error message.
 

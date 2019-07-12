@@ -6,7 +6,7 @@ provider:
   name: aws
   runtime: nodejs6.10
   timeout: 30
-  
+
   # Experimented with various memory sizes. Manually calling the totpValidate
   # function once every few seconds, the average durations were as follows:
   #   512 MB = 48 ms
@@ -16,7 +16,7 @@ provider:
   apiKeys:
     - ${self:custom.namespace}_global
   iamRoleStatements:
-    - Effect: "Allow"
+    - Effect: Allow
       Action:
         - dynamodb:DescribeTable
         - dynamodb:Query
@@ -25,7 +25,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:us-east-1:*:*"
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.namespace}_*"
 
 custom:
   stage: ${opt:stage, self:provider.stage}
@@ -143,53 +143,41 @@ functions:
 resources:
   Resources:
     ApiKeyDynamoDbTable:
-      Type: 'AWS::DynamoDB::Table'
+      Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
-          -
-            AttributeName: value
+          - AttributeName: value
             AttributeType: S
         KeySchema:
-          -
-            AttributeName: value
+          - AttributeName: value
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
-        TableName: '${self:custom.apiKeyTable}'
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:custom.apiKeyTable}
     TotpDynamoDbTable:
-      Type: 'AWS::DynamoDB::Table'
+      Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
-          -
-            AttributeName: uuid
+          - AttributeName: uuid
             AttributeType: S
         KeySchema:
-          -
-            AttributeName: uuid
+          - AttributeName: uuid
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
-        TableName: '${self:custom.totpTable}'
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:custom.totpTable}
     U2fDynamoDbTable:
-      Type: 'AWS::DynamoDB::Table'
+      Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
-          -
-            AttributeName: uuid
+          - AttributeName: uuid
             AttributeType: S
         KeySchema:
-          -
-            AttributeName: uuid
+          - AttributeName: uuid
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
-        TableName: '${self:custom.u2fTable}'
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:custom.u2fTable}
     ApiKeyActivateLogGroup:
       Properties:
         RetentionInDays: "30"
