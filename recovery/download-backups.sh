@@ -17,4 +17,4 @@ echo "What local folder do you want the files saved to? Please use an absolute p
 read localTargetFolder
 echo ""
 
-aws s3 sync --acl private --profile "${awsProfileName}" "s3://${s3bucket}" "${localTargetFolder}"
+aws s3 sync --acl private --sse AES256 --profile "${awsProfileName}" "s3://${s3bucket}" "${localTargetFolder}"
