@@ -4,7 +4,7 @@
 set -e
 
 echo "Which profile (from the file created by 'aws configure') should we use for AWS calls? "
-echo "EXAMPLE: dynamodb-backup-manager-smith "
+echo "EXAMPLE: yourorg-your-iam-name"
 read awsProfileName
 echo ""
 
