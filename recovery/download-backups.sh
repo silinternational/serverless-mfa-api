@@ -3,6 +3,8 @@
 # Exit script with error if any step fails.
 set -e
 
+echo ""
+
 echo "Which profile (from the file created by 'aws configure') should we use for AWS calls? "
 echo "EXAMPLE: yourorg-your-iam-name"
 read awsProfileName
