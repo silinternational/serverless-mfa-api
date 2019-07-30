@@ -10,3 +10,6 @@ jspm_packages
 
 # Library used for recovery
 /recovery/DynamoDbBackUp
+
+# Temporary copy of backups (used during Disaster Recovery)
+/recovery/TempCopyOfBackups
