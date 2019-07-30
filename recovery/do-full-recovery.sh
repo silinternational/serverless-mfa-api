@@ -40,7 +40,7 @@ aws s3 sync \
     --sse AES256 \
     --profile "${awsProfileForDownloadingBackups}" \
     "s3://${s3bucketToRestoreFrom}" \
-    "TempCopyOfBackups/"
+    "recovery/TempCopyOfBackups/"
 
 echo ""
 echo "---------- Preparing to deploy new copy of serverless-mfa-api -----------"
