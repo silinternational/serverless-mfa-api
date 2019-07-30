@@ -15,8 +15,9 @@ echo ""
 
 echo "*** WARNING ***"
 echo "You should ONLY run this from the root folder of your local copy of the "
-echo "Serverless MFA API's files. Please cancel this if you are not in that "
-echo "folder already. [Press Enter to continue] "
+echo "Serverless MFA API's files. You are currently in the following folder: "
+pwd
+echo "Please cancel this if that is not the appropriate folder. [Press Enter to continue] "
 read unusedVariable2
 echo ""
 
