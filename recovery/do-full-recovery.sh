@@ -77,18 +77,20 @@ echo ""
 sudo npm install gulp-cli -g
 sudo npm i -g npm
 
-cd ./recovery
+if [ ! -d "./recovery/DynamoDbBackUp" ]; then
+  cd ./recovery
 
-curl --fail --location --remote-name https://github.com/silinternational/DynamoDbBackUp/archive/master.zip
-unzip master.zip
-rm master.zip
-mv DynamoDbBackUp-master DynamoDbBackUp
+  curl --fail --location --remote-name https://github.com/silinternational/DynamoDbBackUp/archive/master.zip
+  unzip master.zip
+  rm master.zip
+  mv DynamoDbBackUp-master DynamoDbBackUp
 
-cd DynamoDbBackUp
+  cd DynamoDbBackUp
 
-npm install
+  npm install
 
-cd ../..
+  cd ../..
+fi
 
 echo ""
 echo "------------- Preparing to upload backups to new S3 bucket --------------"
