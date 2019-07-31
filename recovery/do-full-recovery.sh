@@ -27,12 +27,12 @@ echo ""
 
 echo "Which AWS CLI profile should we use to download the backup data from the "
 echo "existing Serverless MFA API that you are trying to recover. "
-echo "EXAMPLE: yourorg-your-iam-name"
+echo "EXAMPLE: sourceAWSaccount-dynamodb-backup-manager-yourname"
 read awsProfileForDownloadingBackups
 echo ""
 
 echo "What is the S3 bucket where those backups are stored? "
-echo "EXAMPLE: yourorg.backups.dynamodb.mfa-api "
+echo "EXAMPLE: sourceAWSaccount.backups.dynamodb.mfa-api "
 read s3bucketToRestoreFrom
 echo ""
 
@@ -95,7 +95,7 @@ echo ""
 
 echo "What name do you want to use for the new S3 Bucket where backups will be "
 echo "stored? "
-echo "EXAMPLE: yourorg.backups.dynamodb.${newServiceName}"
+echo "EXAMPLE: targetAWSaccount.backups.dynamodb.${newServiceName}"
 read newS3bucketName
 echo ""
 
