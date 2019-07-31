@@ -101,9 +101,9 @@ echo ""
 
 cd ./recovery/DynamoDbBackUp
 
-#gulp deploy-s3-bucket \
-#    --s3bucket "${newS3bucketName}" \
-#    --s3region "${targetRegion}"
+gulp deploy-s3-bucket \
+    --s3bucket "${newS3bucketName}" \
+    --s3region "${targetRegion}"
 
 aws s3api put-bucket-acl \
     --acl private \
