@@ -37,6 +37,7 @@ read s3bucketToRestoreFrom
 echo ""
 
 aws s3 sync \
+    --delete \
     --acl private \
     --sse AES256 \
     --profile "${awsProfileForDownloadingBackups}" \
@@ -113,6 +114,7 @@ aws s3api put-bucket-acl \
     --bucket "${newS3bucketName}"
 
 aws s3 sync \
+    --delete \
     --acl private \
     --sse AES256 \
     --content-type "application/json" \
