@@ -157,3 +157,66 @@ gulp restore \
     --restoretime ${timestampWithMs}
 
 cd ../..
+
+echo ""
+echo "------- Starting automated backups of this new Serverless MFA API -------"
+echo ""
+
+cd ./recovery/DynamoDbBackUp
+
+gulp deploy-lambda \
+    --s3bucket "${newS3bucketName}" \
+    --s3prefix "${newServiceName}_${stage}_api-key" \
+    --s3region "${targetRegion}" \
+    --dbregion "${targetRegion}" \
+    --lName "backup_dynamodb_${newServiceName}_${stage}_api-key" \
+    --lRegion "${targetRegion}" \
+    --lAlias active \
+    --lRoleName LambdaBackupDynamoDBToS3 \
+    --lTimeout 60
+
+gulp deploy-lambda \
+    --s3bucket "${newS3bucketName}" \
+    --s3prefix "${newServiceName}_${stage}_totp" \
+    --s3region "${targetRegion}" \
+    --dbregion "${targetRegion}" \
+    --lName "backup_dynamodb_${newServiceName}_${stage}_totp" \
+    --lRegion "${targetRegion}" \
+    --lAlias active \
+    --lRoleName LambdaBackupDynamoDBToS3 \
+    --lTimeout 60
+
+gulp deploy-lambda \
+    --s3bucket "${newS3bucketName}" \
+    --s3prefix "${newServiceName}_${stage}_u2f" \
+    --s3region "${targetRegion}" \
+    --dbregion "${targetRegion}" \
+    --lName "backup_dynamodb_${newServiceName}_${stage}_u2f" \
+    --lRegion "${targetRegion}" \
+    --lAlias active \
+    --lRoleName LambdaBackupDynamoDBToS3 \
+    --lTimeout 60
+
+
+gulp deploy-lambda-event \
+    --dbtable "${newServiceName}_${stage}_api-key" \
+    --dbregion "${targetRegion}" \
+    --lName "backup_dynamodb_${newServiceName}_${stage}_api-key" \
+    --lRegion "${targetRegion}" \
+    --lAlias active
+
+gulp deploy-lambda-event \
+    --dbtable "${newServiceName}_${stage}_totp" \
+    --dbregion "${targetRegion}" \
+    --lName "backup_dynamodb_${newServiceName}_${stage}_totp" \
+    --lRegion "${targetRegion}" \
+    --lAlias active
+
+gulp deploy-lambda-event \
+    --dbtable "${newServiceName}_${stage}_u2f" \
+    --dbregion "${targetRegion}" \
+    --lName "backup_dynamodb_${newServiceName}_${stage}_u2f" \
+    --lRegion "${targetRegion}" \
+    --lAlias active
+
+cd ../..
