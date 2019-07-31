@@ -4,21 +4,31 @@
 set -e
 
 echo ""
+echo "---------------------------- Instructions -------------------------------"
+echo ""
 
 echo "*** NOTE: ***"
+echo "This script is designed to be idempotent, so if some step fails, you can "
+echo "simply re-run this script after you have fixed the problem. "
+echo "[Press Enter to continue] "
+read unusedVariable1
+echo ""
+
+echo "*** NOTE 2: ***"
 echo "Most of this process will use your default AWS CLI profile (aka "
 echo "credentials). It should probably have credentials from an IAM user "
-echo "on the target AWS account who has admin privileges. [Press Enter to "
-echo "continue] "
-read unusedVariable1
+echo "on the target AWS account who has admin privileges. "
+echo "[Press Enter to continue] "
+read unusedVariable2
 echo ""
 
 echo "*** WARNING ***"
 echo "You should ONLY run this from the root folder of your local copy of the "
 echo "Serverless MFA API's files. You are currently in the following folder: "
 pwd
-echo "Please cancel this if that is not the appropriate folder. [Press Enter to continue] "
-read unusedVariable2
+echo "Please cancel this if that is not the appropriate folder. "
+echo "[Press Enter to continue] "
+read unusedVariable3
 echo ""
 
 echo ""
@@ -32,7 +42,7 @@ read awsProfileForDownloadingBackups
 echo ""
 
 echo "What is the S3 bucket where those backups are stored? "
-echo "EXAMPLE: sourceAWSaccount.backups.dynamodb.mfa-api "
+echo "EXAMPLE: sourceAWSaccount.backups.dynamodb.mfa-api"
 read s3bucketToRestoreFrom
 echo ""
 
@@ -255,3 +265,21 @@ gulp backup-full \
     --dbregion "${targetRegion}" \
 
 cd ../..
+
+echo ""
+echo "---------------------- Finished setting up the new ----------------------"
+echo "--------------- Serverless MFA API with data from backups ---------------"
+echo ""
+echo "You can now update your systems that need to use this, giving them the "
+echo "new API Gateway URL (visible in the Serverless output a ways above this "
+echo "line, as well as in the AWS CloudFormation 'Service Endpoint' Output for "
+echo "the ${newServiceName}-${stage} stack) as the new value for their "
+echo "apiBaseUrl. (The apiKey and apiSecret will not have changed, since those "
+echo "were in the restored data.) "
+echo ""
+echo "If using this with our IdP-in-a-Box, you will need to update the "
+echo "mfa_totp_apibaseurl and mfa_u2f_apibaseurl Terraform variables for the "
+echo "ID Broker workspace of the applicable IdP."
+echo ""
+echo "========================================================================="
+echo ""
