@@ -56,7 +56,7 @@ read newServiceName
 echo ""
 
 echo "Which stage (dev or prod) should we deploy? "
-read targetStage
+read stage
 echo ""
 
 echo "Which AWS region should we deploy to? "
@@ -65,7 +65,7 @@ read targetRegion
 echo ""
 
 serverless deploy -v \
-    --stage "${targetStage}" \
+    --stage "${stage}" \
     --region "${targetRegion}" \
     --service "${newServiceName}"
 
@@ -115,5 +115,45 @@ aws s3 sync \
     --content-type "application/json" \
     "../TempCopyOfBackups/" \
     "s3://${newS3bucketName}"
+
+cd ../..
+
+echo ""
+echo "----------- Loading backup data into the new DynamoDB tables -------------"
+echo ""
+
+cd ./recovery/DynamoDbBackUp
+
+timestampWithMs=$(date +%s000)
+oldServiceNameGuess=$(ls ../TempCopyOfBackups/ | sed 's/_.*$//' | uniq)
+
+echo "What is the name used for the serverless-mfa-api that you are restoring "
+echo "data from? The default is mfa-api, and it looks like it is probably ${oldServiceNameGuess}"
+read oldServiceName
+echo ""
+
+gulp restore \
+    --s3bucket "${newS3bucketName}" \
+    --s3prefix "${oldServiceName}_${stage}_api-key" \
+    --s3region "${targetRegion}" \
+    --dbtable "${newServiceName}_${stage}_api-key" \
+    --dbregion "${targetRegion}" \
+    --restoretime ${timestampWithMs}
+
+gulp restore \
+    --s3bucket "${newS3bucketName}" \
+    --s3prefix "${oldServiceName}_${stage}_totp" \
+    --s3region "${targetRegion}" \
+    --dbtable "${newServiceName}_${stage}_totp" \
+    --dbregion "${targetRegion}" \
+    --restoretime ${timestampWithMs}
+
+gulp restore \
+    --s3bucket "${newS3bucketName}" \
+    --s3prefix "${oldServiceName}_${stage}_u2f" \
+    --s3region "${targetRegion}" \
+    --dbtable "${newServiceName}_${stage}_u2f" \
+    --dbregion "${targetRegion}" \
+    --restoretime ${timestampWithMs}
 
 cd ../..
