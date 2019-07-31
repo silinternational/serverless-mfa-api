@@ -50,8 +50,9 @@ echo ""
 echo "What should we call this instance of the Serverless MFA API? "
 echo "*** WARNING ***: The production copy is probably called mfa-api, so "
 echo "DO NOT use that unless you want to overwrite your existing production "
-echo "copy of the Serverless MFA API. For testing, or to deploy a separate "
-echo "copy, use some other name (such as mfa-api-test-1). "
+echo "copy of the Serverless MFA API (which I have never tried). To deploy a "
+echo "separate copy (especially for testing), use some other name (such as "
+echo "mfa-api-test-1). "
 read newServiceName
 echo ""
 
@@ -128,7 +129,8 @@ timestampWithMs=$(date +%s000)
 oldServiceNameGuess=$(ls ../TempCopyOfBackups/ | sed 's/_.*$//' | uniq)
 
 echo "What is the name used for the serverless-mfa-api that you are restoring "
-echo "data from? The default is mfa-api, and it looks like it is probably ${oldServiceNameGuess}"
+echo "data from? The default is mfa-api, and it looks like it is one of these: "
+echo "${oldServiceNameGuess}"
 read oldServiceName
 echo ""
 
