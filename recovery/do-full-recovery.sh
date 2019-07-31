@@ -220,3 +220,32 @@ gulp deploy-lambda-event \
     --lAlias active
 
 cd ../..
+
+echo ""
+echo "----- Doing full backup to ensure new S3 bucket items are encrypted -----"
+echo ""
+
+cd ./recovery/DynamoDbBackUp
+
+gulp backup-full \
+    --s3bucket "${newS3bucketName}" \
+    --s3prefix "${newServiceName}_${stage}_api-key" \
+    --s3region "${targetRegion}" \
+    --dbtable "${newServiceName}_${stage}_api-key" \
+    --dbregion "${targetRegion}" \
+
+gulp backup-full \
+    --s3bucket "${newS3bucketName}" \
+    --s3prefix "${newServiceName}_${stage}_totp" \
+    --s3region "${targetRegion}" \
+    --dbtable "${newServiceName}_${stage}_totp" \
+    --dbregion "${targetRegion}" \
+
+gulp backup-full \
+    --s3bucket "${newS3bucketName}" \
+    --s3prefix "${newServiceName}_${stage}_u2f" \
+    --s3region "${targetRegion}" \
+    --dbtable "${newServiceName}_${stage}_u2f" \
+    --dbregion "${targetRegion}" \
+
+cd ../..
