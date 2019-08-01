@@ -3,6 +3,8 @@
 # Exit script with error if any step fails.
 set -e
 
+tableSuffixes='api-key totp u2f'
+
 echo ""
 echo "---------------------------- Instructions -------------------------------"
 echo ""
@@ -150,29 +152,17 @@ echo "${oldServiceNameGuess}"
 read oldServiceName
 echo ""
 
-gulp restore \
-    --s3bucket "${newS3bucketName}" \
-    --s3prefix "${oldServiceName}_${stage}_api-key" \
-    --s3region "${targetRegion}" \
-    --dbtable "${newServiceName}_${stage}_api-key" \
-    --dbregion "${targetRegion}" \
-    --restoretime ${timestampWithMs}
-
-gulp restore \
-    --s3bucket "${newS3bucketName}" \
-    --s3prefix "${oldServiceName}_${stage}_totp" \
-    --s3region "${targetRegion}" \
-    --dbtable "${newServiceName}_${stage}_totp" \
-    --dbregion "${targetRegion}" \
-    --restoretime ${timestampWithMs}
-
-gulp restore \
-    --s3bucket "${newS3bucketName}" \
-    --s3prefix "${oldServiceName}_${stage}_u2f" \
-    --s3region "${targetRegion}" \
-    --dbtable "${newServiceName}_${stage}_u2f" \
-    --dbregion "${targetRegion}" \
-    --restoretime ${timestampWithMs}
+for tableSuffix in $tableSuffixes; do
+  echo "Loading ${tableSuffix} backup data into DynamoDB:"
+  
+  gulp restore \
+      --s3bucket "${newS3bucketName}" \
+      --s3prefix "${oldServiceName}_${stage}_${tableSuffix}" \
+      --s3region "${targetRegion}" \
+      --dbtable "${newServiceName}_${stage}_${tableSuffix}" \
+      --dbregion "${targetRegion}" \
+      --restoretime ${timestampWithMs}
+done
 
 cd ../..
 
@@ -182,60 +172,27 @@ echo ""
 
 cd ./recovery/DynamoDbBackUp
 
-gulp deploy-lambda \
-    --s3bucket "${newS3bucketName}" \
-    --s3prefix "${newServiceName}_${stage}_api-key" \
-    --s3region "${targetRegion}" \
-    --dbregion "${targetRegion}" \
-    --lName "backup_dynamodb_${newServiceName}_${stage}_api-key" \
-    --lRegion "${targetRegion}" \
-    --lAlias active \
-    --lRoleName LambdaBackupDynamoDBToS3 \
-    --lTimeout 60
-
-gulp deploy-lambda \
-    --s3bucket "${newS3bucketName}" \
-    --s3prefix "${newServiceName}_${stage}_totp" \
-    --s3region "${targetRegion}" \
-    --dbregion "${targetRegion}" \
-    --lName "backup_dynamodb_${newServiceName}_${stage}_totp" \
-    --lRegion "${targetRegion}" \
-    --lAlias active \
-    --lRoleName LambdaBackupDynamoDBToS3 \
-    --lTimeout 60
-
-gulp deploy-lambda \
-    --s3bucket "${newS3bucketName}" \
-    --s3prefix "${newServiceName}_${stage}_u2f" \
-    --s3region "${targetRegion}" \
-    --dbregion "${targetRegion}" \
-    --lName "backup_dynamodb_${newServiceName}_${stage}_u2f" \
-    --lRegion "${targetRegion}" \
-    --lAlias active \
-    --lRoleName LambdaBackupDynamoDBToS3 \
-    --lTimeout 60
-
-
-gulp deploy-lambda-event \
-    --dbtable "${newServiceName}_${stage}_api-key" \
-    --dbregion "${targetRegion}" \
-    --lName "backup_dynamodb_${newServiceName}_${stage}_api-key" \
-    --lRegion "${targetRegion}" \
-    --lAlias active
-
-gulp deploy-lambda-event \
-    --dbtable "${newServiceName}_${stage}_totp" \
-    --dbregion "${targetRegion}" \
-    --lName "backup_dynamodb_${newServiceName}_${stage}_totp" \
-    --lRegion "${targetRegion}" \
-    --lAlias active
-
-gulp deploy-lambda-event \
-    --dbtable "${newServiceName}_${stage}_u2f" \
-    --dbregion "${targetRegion}" \
-    --lName "backup_dynamodb_${newServiceName}_${stage}_u2f" \
-    --lRegion "${targetRegion}" \
-    --lAlias active
+for tableSuffix in $tableSuffixes; do
+  echo "Starting automated backups of ${tableSuffix} from DynamoDB to S3:"
+  
+  gulp deploy-lambda \
+      --s3bucket "${newS3bucketName}" \
+      --s3prefix "${newServiceName}_${stage}_${tableSuffix}" \
+      --s3region "${targetRegion}" \
+      --dbregion "${targetRegion}" \
+      --lName "backup_dynamodb_${newServiceName}_${stage}_${tableSuffix}" \
+      --lRegion "${targetRegion}" \
+      --lAlias active \
+      --lRoleName LambdaBackupDynamoDBToS3 \
+      --lTimeout 60
+  
+  gulp deploy-lambda-event \
+      --dbtable "${newServiceName}_${stage}_${tableSuffix}" \
+      --dbregion "${targetRegion}" \
+      --lName "backup_dynamodb_${newServiceName}_${stage}_${tableSuffix}" \
+      --lRegion "${targetRegion}" \
+      --lAlias active
+done
 
 cd ../..
 
@@ -245,26 +202,16 @@ echo ""
 
 cd ./recovery/DynamoDbBackUp
 
-gulp backup-full \
-    --s3bucket "${newS3bucketName}" \
-    --s3prefix "${newServiceName}_${stage}_api-key" \
-    --s3region "${targetRegion}" \
-    --dbtable "${newServiceName}_${stage}_api-key" \
-    --dbregion "${targetRegion}" \
-
-gulp backup-full \
-    --s3bucket "${newS3bucketName}" \
-    --s3prefix "${newServiceName}_${stage}_totp" \
-    --s3region "${targetRegion}" \
-    --dbtable "${newServiceName}_${stage}_totp" \
-    --dbregion "${targetRegion}" \
-
-gulp backup-full \
-    --s3bucket "${newS3bucketName}" \
-    --s3prefix "${newServiceName}_${stage}_u2f" \
-    --s3region "${targetRegion}" \
-    --dbtable "${newServiceName}_${stage}_u2f" \
-    --dbregion "${targetRegion}" \
+for tableSuffix in $tableSuffixes; do
+  echo "Doing full backup of ${tableSuffix} from DynamoDB to S3:"
+  
+  gulp backup-full \
+      --s3bucket "${newS3bucketName}" \
+      --s3prefix "${newServiceName}_${stage}_${tableSuffix}" \
+      --s3region "${targetRegion}" \
+      --dbtable "${newServiceName}_${stage}_${tableSuffix}" \
+      --dbregion "${targetRegion}"
+done
 
 cd ../..
 
