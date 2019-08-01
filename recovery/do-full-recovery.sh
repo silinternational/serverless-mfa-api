@@ -267,6 +267,12 @@ gulp backup-full \
 cd ../..
 
 echo ""
+echo "--------------- Removing temporary local copy of backups ----------------"
+echo ""
+
+rm -r recovery/TempCopyOfBackups/
+
+echo ""
 echo "---------------------- Finished setting up the new ----------------------"
 echo "--------------- Serverless MFA API with data from backups ---------------"
 echo ""
