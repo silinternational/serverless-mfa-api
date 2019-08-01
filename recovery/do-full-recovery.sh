@@ -240,7 +240,10 @@ echo ""
 for tableSuffix in $tableSuffixes; do
   echo "Removing temporary remote copy of original ${tableSuffix} backup data:"
   
-  aws s3 rm "s3://${newS3bucketName}/${oldServiceName}_${stage}_${tableSuffix}/" \
+  aws s3 rm "s3://${newS3bucketName}/${oldServiceName}_dev_${tableSuffix}/" \
+      --recursive
+  
+  aws s3 rm "s3://${newS3bucketName}/${oldServiceName}_prod_${tableSuffix}/" \
       --recursive
 done
 
