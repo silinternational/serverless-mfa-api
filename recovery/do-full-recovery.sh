@@ -59,6 +59,14 @@ aws s3 sync \
     "recovery/TempCopyOfBackups/"
 
 echo ""
+echo "------------- Installing serverless-mfa-api's dependencies --------------"
+echo ""
+
+sudo npm i -g npm
+
+npm ci
+
+echo ""
 echo "---------- Preparing to deploy new copy of serverless-mfa-api -----------"
 echo ""
 
@@ -90,7 +98,6 @@ echo "---------------------- Installing backups library -----------------------"
 echo ""
 
 sudo npm install gulp-cli -g
-sudo npm i -g npm
 
 if [ ! -d "./recovery/DynamoDbBackUp" ]; then
   cd ./recovery
