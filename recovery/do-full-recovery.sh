@@ -25,7 +25,9 @@ echo ""
 echo "*** WARNING ***"
 echo "You should ONLY run this from the root folder of your local copy of the "
 echo "Serverless MFA API's files. You are currently in the following folder: "
+echo ""
 pwd
+echo ""
 echo "Please cancel this if that is not the appropriate folder. "
 echo "[Press Enter to continue] "
 read unusedVariable3
@@ -36,7 +38,7 @@ echo "--------------------- Preparing to download backups ---------------------"
 echo ""
 
 echo "Which AWS CLI profile should we use to download the backup data from the "
-echo "existing Serverless MFA API that you are trying to recover. "
+echo "existing Serverless MFA API that you are trying to recover? "
 echo "EXAMPLE: sourceAWSaccount-dynamodb-backup-manager-yourname"
 read awsProfileForDownloadingBackups
 echo ""
@@ -58,7 +60,7 @@ echo ""
 echo "---------- Preparing to deploy new copy of serverless-mfa-api -----------"
 echo ""
 
-echo "What should we call this instance of the Serverless MFA API? "
+echo "What should we call the new instance of the Serverless MFA API? "
 echo "*** WARNING ***: The production copy is probably called mfa-api, so "
 echo "DO NOT use that unless you want to overwrite your existing production "
 echo "copy of the Serverless MFA API (which I have never tried). To deploy a "
