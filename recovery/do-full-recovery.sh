@@ -123,6 +123,11 @@ gulp deploy-s3-bucket \
     --s3bucket "${newS3bucketName}" \
     --s3region "${targetRegion}"
 
+echo "Waiting for the new S3 bucket to exist..."
+
+aws s3api wait bucket-exists \
+    --bucket "${newS3bucketName}"
+
 aws s3api put-bucket-acl \
     --acl private \
     --bucket "${newS3bucketName}"
