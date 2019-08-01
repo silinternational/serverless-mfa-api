@@ -234,6 +234,17 @@ echo ""
 rm -r recovery/TempCopyOfBackups/
 
 echo ""
+echo "--------------- Removing temporary remote copy of backups ---------------"
+echo ""
+
+for tableSuffix in $tableSuffixes; do
+  echo "Removing temporary remote copy of original ${tableSuffix} backup data:"
+  
+  aws s3 rm "s3://${newS3bucketName}/${oldServiceName}_${stage}_${tableSuffix}/" \
+      --recursive
+done
+
+echo ""
 echo "---------------------- Finished setting up the new ----------------------"
 echo "--------------- Serverless MFA API with data from backups ---------------"
 echo ""
