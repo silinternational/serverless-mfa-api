@@ -7,3 +7,9 @@ jspm_packages
 
 # ide stuff
 .idea/
+
+# Library used for recovery
+/recovery/DynamoDbBackUp
+
+# Temporary copy of backups (used during Disaster Recovery)
+/recovery/TempCopyOfBackups
