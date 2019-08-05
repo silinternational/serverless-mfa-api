@@ -102,10 +102,10 @@ sudo npm install gulp-cli -g
 if [ ! -d "./recovery/DynamoDbBackUp" ]; then
   cd ./recovery
 
-  curl --fail --location --remote-name https://github.com/silinternational/DynamoDbBackUp/archive/feature/update-to-nodejs-10.zip
-  unzip update-to-nodejs-10.zip
-  rm update-to-nodejs-10.zip
-  mv DynamoDbBackUp-feature-update-to-nodejs-10 DynamoDbBackUp
+  curl --fail --location --remote-name https://github.com/silinternational/DynamoDbBackUp/archive/master.zip
+  unzip master.zip
+  rm master.zip
+  mv DynamoDbBackUp-master DynamoDbBackUp
 
   cd DynamoDbBackUp
 
