@@ -121,6 +121,7 @@ echo ""
 echo "What name do you want to use for the new S3 Bucket where backups will be "
 echo "stored? "
 echo "EXAMPLE: targetAWSaccount.backups.dynamodb.${newServiceName}"
+echo "(but replace targetAWSaccount with the name of the target AWS account)"
 read newS3bucketName
 echo ""
 
