@@ -41,7 +41,7 @@ echo ""
 
 echo "Which AWS CLI profile should we use to download the backup data from the "
 echo "existing Serverless MFA API that you are trying to recover? "
-echo "EXAMPLE: sourceAWSaccount-dynamodb-backup-manager-yourname"
+echo "EXAMPLE: your-name-sourceAWSaccount"
 read awsProfileForDownloadingBackups
 echo ""
 
