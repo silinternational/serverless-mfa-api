@@ -36,13 +36,30 @@ read unusedVariable3
 echo ""
 
 echo ""
-echo "--------------------- Preparing to download backups ---------------------"
+echo "--------------------- Configuring AWS CLI profiles ----------------------"
 echo ""
 
-echo "Which AWS CLI profile should we use to download the backup data from the "
-echo "existing Serverless MFA API that you are trying to recover? "
-echo "EXAMPLE: your-name-sourceAWSaccount"
-read awsProfileForDownloadingBackups
+echo "Please enter the AWS Access Key ID/Secret for the source AWS account, "
+echo "which we will use to download the backup data from S3."
+echo ""
+echo "For the default region, use the region where the current Serverless MFA "
+echo "API is running (probably us-east-1). The Default output format can be "
+echo "left blank."
+aws configure --profile restore-s3-backups
+echo ""
+
+echo "Now please enter the AWS Access Key ID/Secret for the target AWS "
+echo "account, which we will use to create the new copy of the Serverless MFA "
+echo "API. "
+echo ""
+echo "For the default region, use the region where you want to deploy the new "
+echo "copy of the Serverless MFA API (such as us-east-1, us-east-2, us-west-1, "
+echo "or us-west-2). The Default output format can be left blank."
+aws configure
+echo ""
+
+echo ""
+echo "--------------------- Preparing to download backups ---------------------"
 echo ""
 
 echo "What is the S3 bucket where those backups are stored? "
@@ -54,7 +71,7 @@ aws s3 sync \
     --delete \
     --acl private \
     --sse AES256 \
-    --profile "${awsProfileForDownloadingBackups}" \
+    --profile "restore-s3-backups" \
     "s3://${s3bucketToRestoreFrom}" \
     "recovery/TempCopyOfBackups/"
 
