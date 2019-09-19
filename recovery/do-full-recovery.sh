@@ -24,17 +24,6 @@ echo "[Press Enter to continue] "
 read unusedVariable2
 echo ""
 
-echo "*** WARNING ***"
-echo "You should ONLY run this from the root folder of your local copy of the "
-echo "Serverless MFA API's files. You are currently in the following folder: "
-echo ""
-pwd
-echo ""
-echo "Please cancel this if that is not the appropriate folder. "
-echo "[Press Enter to continue] "
-read unusedVariable3
-echo ""
-
 echo ""
 echo "--------------------- Configuring AWS CLI profiles ----------------------"
 echo ""
