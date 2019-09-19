@@ -24,25 +24,31 @@ echo "[Press Enter to continue] "
 read unusedVariable2
 echo ""
 
-echo "*** WARNING ***"
-echo "You should ONLY run this from the root folder of your local copy of the "
-echo "Serverless MFA API's files. You are currently in the following folder: "
 echo ""
-pwd
+echo "--------------------- Configuring AWS CLI profiles ----------------------"
 echo ""
-echo "Please cancel this if that is not the appropriate folder. "
-echo "[Press Enter to continue] "
-read unusedVariable3
+
+echo "Please enter the AWS Access Key ID/Secret for the source AWS account, "
+echo "which we will use to download the backup data from S3."
+echo ""
+echo "For the default region, use the region where the current Serverless MFA "
+echo "API is running (probably us-east-1). The Default output format can be "
+echo "left blank."
+aws configure --profile restore-s3-backups
+echo ""
+
+echo "Now please enter the AWS Access Key ID/Secret for the target AWS "
+echo "account, which we will use to create the new copy of the Serverless MFA "
+echo "API. "
+echo ""
+echo "For the default region, use the region where you want to deploy the new "
+echo "copy of the Serverless MFA API (such as us-east-1, us-east-2, us-west-1, "
+echo "or us-west-2). The Default output format can be left blank."
+aws configure
 echo ""
 
 echo ""
 echo "--------------------- Preparing to download backups ---------------------"
-echo ""
-
-echo "Which AWS CLI profile should we use to download the backup data from the "
-echo "existing Serverless MFA API that you are trying to recover? "
-echo "EXAMPLE: sourceAWSaccount-dynamodb-backup-manager-yourname"
-read awsProfileForDownloadingBackups
 echo ""
 
 echo "What is the S3 bucket where those backups are stored? "
@@ -54,7 +60,7 @@ aws s3 sync \
     --delete \
     --acl private \
     --sse AES256 \
-    --profile "${awsProfileForDownloadingBackups}" \
+    --profile "restore-s3-backups" \
     "s3://${s3bucketToRestoreFrom}" \
     "recovery/TempCopyOfBackups/"
 
@@ -62,7 +68,7 @@ echo ""
 echo "------------- Installing serverless-mfa-api's dependencies --------------"
 echo ""
 
-sudo npm i -g npm
+npm i -g npm
 
 npm ci
 
@@ -97,7 +103,7 @@ echo ""
 echo "---------------------- Installing backups library -----------------------"
 echo ""
 
-sudo npm install gulp-cli -g
+npm install gulp-cli -g
 
 if [ ! -d "./recovery/DynamoDbBackUp" ]; then
   cd ./recovery
@@ -121,6 +127,7 @@ echo ""
 echo "What name do you want to use for the new S3 Bucket where backups will be "
 echo "stored? "
 echo "EXAMPLE: targetAWSaccount.backups.dynamodb.${newServiceName}"
+echo "(but replace targetAWSaccount with the name of the target AWS account)"
 read newS3bucketName
 echo ""
 
@@ -251,16 +258,23 @@ echo ""
 echo "---------------------- Finished setting up the new ----------------------"
 echo "--------------- Serverless MFA API with data from backups ---------------"
 echo ""
-echo "You can now update your systems that need to use this, giving them the "
-echo "new API Gateway URL (visible in the Serverless output a ways above this "
-echo "line, as well as in the AWS CloudFormation 'Service Endpoint' Output for "
-echo "the ${newServiceName}-${stage} stack) as the new value for their "
-echo "apiBaseUrl. (The apiKey and apiSecret will not have changed, since those "
-echo "were in the restored data.) "
+echo "   IMPORTANT!   "
 echo ""
-echo "If using this with our IdP-in-a-Box, you will need to update the "
-echo "mfa_totp_apibaseurl and mfa_u2f_apibaseurl Terraform variables for the "
-echo "ID Broker workspace of the applicable IdP."
+echo "You can now update your systems that need to use this, giving them the "
+echo "new API Gateway URL. To find that... "
+echo ""
+echo "1. Sign in to the target AWS account. "
+echo "2. Go to CloudFormation. "
+echo "3. Find the ${newServiceName}-${stage} stack. "
+echo "4. In its Outputs section, find the 'Service Endpoint' URL. "
+echo "5. ADD A TRAILING SLASH and use that as the new value for the apiBaseUrl "
+echo "   of any IdP that should use this new copy of the Serverless MFA API. "
+echo "   (The apiKey and apiSecret will not have changed, since those were in "
+echo "   the restored data.) "
+echo ""
+echo "   If using this with our IdP-in-a-Box, you will do so by updating the "
+echo "   mfa_totp_apibaseurl and mfa_u2f_apibaseurl Terraform variables for "
+echo "   the ID Broker workspace of the applicable IdP."
 echo ""
 echo "========================================================================="
 echo ""
