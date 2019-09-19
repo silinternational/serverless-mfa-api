@@ -79,7 +79,7 @@ echo ""
 echo "------------- Installing serverless-mfa-api's dependencies --------------"
 echo ""
 
-sudo npm i -g npm
+npm i -g npm
 
 npm ci
 
@@ -114,7 +114,7 @@ echo ""
 echo "---------------------- Installing backups library -----------------------"
 echo ""
 
-sudo npm install gulp-cli -g
+npm install gulp-cli -g
 
 if [ ! -d "./recovery/DynamoDbBackUp" ]; then
   cd ./recovery
