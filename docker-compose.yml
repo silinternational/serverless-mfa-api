@@ -4,3 +4,10 @@ services:
     build: .
     volumes:
       - ./:/usr/src/app
+
+  do-full-recovery:
+    build: recovery/.
+    volumes:
+      - ./:/data
+    working_dir: /data
+    command: ./recovery/do-full-recovery.sh
