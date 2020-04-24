@@ -1,4 +1,6 @@
 const express = require('express');
+const apiKeyHandlers = require('../handlers/api-key.js');
+const totpHandlers = require('../handlers/totp.js');
 const u2fHandlers = require('../handlers/u2f.js');
 
 const app = express();
@@ -27,9 +29,19 @@ const createCallbackUsing = response => (error, data) => {
   }
 };
 
-// Define URL mapping.
+// @todo - Figure out how best to handle these "private" API endpoints.
+app.post('/api-key', mapTo(apiKeyHandlers.create));
+app.post('/api-key/activate', mapTo(apiKeyHandlers.activate));
+
+app.post('/totp', mapTo(totpHandlers.create));
+app.delete('/totp/:uuid', mapTo(totpHandlers.delete));
+app.post('/totp/:uuid/validate', mapTo(totpHandlers.validate));
+
 app.post('/u2f', mapTo(u2fHandlers.createRegistration));
+app.delete('/u2f/:uuid', mapTo(u2fHandlers.delete));
 app.put('/u2f/:uuid', mapTo(u2fHandlers.validateRegistration));
+app.post('/u2f/:uuid/auth', mapTo(u2fHandlers.createAuthentication));
+app.put('/u2f/:uuid/auth', mapTo(u2fHandlers.validateAuthentication));
 
 app.listen(8000, () => {
   console.log('Local development server listening on port 8000')
