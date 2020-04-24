@@ -6,7 +6,7 @@ const app = express();
 app.post('/u2f', ({headers, body}, response) => {
   u2fHandlers.createRegistration({headers, body}, {}, (error, data) => {
     if (error) {
-      response.status(400).send(error);
+      response.status(500).send(error);
     } else {
       response.status(data.statusCode).send(data.body);
     }
