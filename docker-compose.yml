@@ -11,3 +11,8 @@ services:
       - ./:/data
     working_dir: /data
     command: ./recovery/do-full-recovery.sh
+
+  dynamodb:
+    image: amazon/dynamodb-local
+    ports:
+      - "8000:8000"
