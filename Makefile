@@ -1,6 +1,3 @@
-start:
-	echo This Makefile has no default action. Be specific.
-
 dev-server:
 	node development/server
 
