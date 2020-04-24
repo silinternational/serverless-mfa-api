@@ -1,4 +1,6 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+
 const apiKeyHandlers = require('../handlers/api-key.js');
 const totpHandlers = require('../handlers/totp.js');
 const u2fHandlers = require('../handlers/u2f.js');
@@ -28,6 +30,9 @@ const createCallbackUsing = response => (error, data) => {
     response.status(data.statusCode).send(data.body);
   }
 };
+
+// Parse the request body and always return as a text string.
+app.use(bodyParser.text({type: () => true}));
 
 // @todo - Figure out how best to handle these "private" API endpoints.
 app.post('/api-key', mapTo(apiKeyHandlers.create));
