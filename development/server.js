@@ -50,6 +50,6 @@ app.put('/u2f/:uuid', mapTo(u2fHandlers.validateRegistration));
 app.post('/u2f/:uuid/auth', mapTo(u2fHandlers.createAuthentication));
 app.put('/u2f/:uuid/auth', mapTo(u2fHandlers.validateAuthentication));
 
-app.listen(8000, () => {
-  console.log('Local development server listening on port 8000')
+app.listen(8080, () => {
+  console.log('Local development server listening on port 8080')
 });
