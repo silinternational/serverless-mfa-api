@@ -25,3 +25,11 @@ aws dynamodb create-table \
   --billing-mode PAY_PER_REQUEST \
   --endpoint-url http://localhost:8000 \
   --region localhost
+
+aws dynamodb create-table \
+  --table-name development_server_webauthn \
+  --attribute-definitions AttributeName=uuid,AttributeType=S \
+  --key-schema AttributeName=uuid,KeyType=HASH \
+  --billing-mode PAY_PER_REQUEST \
+  --endpoint-url http://localhost:8000 \
+  --region localhost
