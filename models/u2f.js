@@ -116,6 +116,11 @@ module.exports.createRegistration = (apiKeyValue, apiSecret, {appId} = {}, callb
       return;
     }
 
+    if ((!appId) || typeof appId !== 'string') {
+      response.returnError(400, 'appId is required', callback);
+      return;
+    }
+
     const registrationRequest = u2f.request(appId);
 
     const u2fUuid = uuid.v4();
