@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const apiKeyHandlers = require('../handlers/api-key.js');
 const totpHandlers = require('../handlers/totp.js');
 const u2fHandlers = require('../handlers/u2f.js');
+const webauthnHandlers = require('../handlers/webauthn.js');
 
 const app = express();
 const mapTo = requestHandler => (request, response) => {
@@ -49,6 +50,8 @@ app.delete('/u2f/:uuid', mapTo(u2fHandlers.delete));
 app.put('/u2f/:uuid', mapTo(u2fHandlers.validateRegistration));
 app.post('/u2f/:uuid/auth', mapTo(u2fHandlers.createAuthentication));
 app.put('/u2f/:uuid/auth', mapTo(u2fHandlers.validateAuthentication));
+
+app.post('/attestation/options', mapTo(webauthnHandlers.createAttestation));
 
 app.listen(8080, () => {
   console.log('Local development server listening on port 8080')
