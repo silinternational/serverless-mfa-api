@@ -8,7 +8,7 @@ aws dynamodb create-table \
   --key-schema AttributeName=value,KeyType=HASH \
   --billing-mode PAY_PER_REQUEST \
   --endpoint-url http://localhost:8000 \
-  --region local
+  --region localhost
 
 aws dynamodb create-table \
   --table-name development_server_totp \
@@ -16,7 +16,7 @@ aws dynamodb create-table \
   --key-schema AttributeName=uuid,KeyType=HASH \
   --billing-mode PAY_PER_REQUEST \
   --endpoint-url http://localhost:8000 \
-  --region local
+  --region localhost
 
 aws dynamodb create-table \
   --table-name development_server_u2f \
@@ -24,4 +24,4 @@ aws dynamodb create-table \
   --key-schema AttributeName=uuid,KeyType=HASH \
   --billing-mode PAY_PER_REQUEST \
   --endpoint-url http://localhost:8000 \
-  --region local
+  --region localhost
