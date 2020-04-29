@@ -15,7 +15,8 @@ For details about the various API endpoints, see
     must be provided as an `x-api-key` header in the HTTP request.
 - We create a new API Key and email it to that email address.
   * NOTE: At the moment, we do not actually send that email, since our use case
-    is so limited that we can simply look up the API Key in the database.
+    is so limited that we can simply look up the API Key in the database. For
+    local development, run `make list-dev-api-keys` to see it.
 - The consumer does a `POST` to `/api-key/activate`, providing the email address
   and the API Key.
 - We respond with an API Secret (which is actually an AES key, which we will use
