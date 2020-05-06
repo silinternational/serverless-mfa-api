@@ -8,6 +8,9 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient({
 const encryption = require('../helpers/encryption.js');
 const response = require('../helpers/response.js');
 const uuid = require('uuid');
+const {
+  generateRegistrationChallenge,
+} = require('@webauthn/server');
 
 const createNewWebauthnRecord = (webauthnRecord, callback) => {
   const params = {
@@ -22,8 +25,30 @@ const createNewWebauthnRecord = (webauthnRecord, callback) => {
   dynamoDb.put(params, callback);
 };
 
-module.exports.createAttestation = (apiKeyValue, apiSecret, options = {}, callback) => {
-  console.log('Begin creating WebAuthn attestation');
+/**
+ * Returns an object defining the options to use when creating a public-key
+ * credential in the user's browser.
+ *
+ * @param apiKeyValue
+ * @param apiSecret
+ * @param requestData
+ * @param callback
+ */
+module.exports.createRegistration = (apiKeyValue, apiSecret, requestData = {}, callback) => {
+  console.log('Begin creating WebAuthn registration');
   
-  console.log('options', options); // TEMP
+  try {
+    const result = generateRegistrationChallenge(requestData);
+    response.returnSuccess(result, callback);
+    return;
+  } catch (error) {
+    console.error('Error creating WebAuthn registration. Error: ' + error.message);
+    if (error.message) {
+      response.returnError(400, error.message, callback);
+      return;
+    } else {
+      response.returnError(500, "Unknown error", callback);
+      return;
+    }
+  }
 };
