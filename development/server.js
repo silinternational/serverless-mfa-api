@@ -53,6 +53,7 @@ app.put('/u2f/:uuid/auth', mapTo(u2fHandlers.validateAuthentication));
 
 app.post('/webauthn', mapTo(webauthnHandlers.createRegistration));
 
-app.listen(8080, () => {
-  console.log('Local development server listening on port 8080')
+const port = 8080;
+app.listen(port, () => {
+  console.log(`Local development server listening on port ${port}`)
 });
