@@ -1,5 +1,5 @@
 dev-server:
-	node development/server
+	supervisor development/server
 
 dynamodb:
 	docker-compose up -d dynamodb
