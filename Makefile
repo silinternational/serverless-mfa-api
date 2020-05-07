@@ -1,3 +1,6 @@
+dev-client:
+	rollup development/site/client.js --file development/site/client-bundle.js --format iife --watch
+
 dev-server:
 	supervisor development/server
 

@@ -37,7 +37,12 @@ const createCallbackUsing = response => (error, data) => {
 // Parse the request body and always return as a text string.
 app.use(bodyParser.text({type: () => true}));
 
-// @todo - Figure out how best to handle these "private" API endpoints.
+// Simple front-end site for testing:
+app.use('/site', express.static('development/site'));
+
+
+// API endpoints:
+// @todo - Figure out how best to handle these two "private" API endpoints.
 app.post('/api-key', mapTo(apiKeyHandlers.create));
 app.post('/api-key/activate', mapTo(apiKeyHandlers.activate));
 

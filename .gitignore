@@ -13,3 +13,6 @@ jspm_packages
 
 # Temporary copy of backups (used during Disaster Recovery)
 /recovery/TempCopyOfBackups
+
+# JS bundle generated during local development (see `make dev-client`)
+/development/site/client-bundle.js
