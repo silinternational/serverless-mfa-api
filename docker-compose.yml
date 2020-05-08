@@ -5,6 +5,36 @@ services:
     volumes:
       - ./:/usr/src/app
 
+  dev-client-bundle:
+    build: development/.
+    volumes:
+      - ./:/data/
+    working_dir: /data/
+    # tty needed in order for rollup watch to work.
+    tty: true
+    command: rollup development/site/client.js --file development/site/client-bundle.js --format iife --watch
+
+  dev-https-proxy:
+    image: silintl/traefik-https-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./development/cert/:/cert/
+    env_file:
+      - ./development/https-proxy.local.env
+
+  dev-server:
+    build: development/.
+    depends_on:
+      - dev-https-proxy
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/data/
+    working_dir: /data/
+    command: supervisor development/server.js
+
   do-full-recovery:
     build: recovery/.
     volumes:

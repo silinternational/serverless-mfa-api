@@ -16,3 +16,10 @@ jspm_packages
 
 # JS bundle generated during local development (see `make dev-client`)
 /development/site/client-bundle.js
+
+# Folder with cert files used for dev-server https-proxy / traefik
+development/cert
+
+# Local environment variables files, typically with secrets
+local.env
+*.local.env
