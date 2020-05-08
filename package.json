@@ -23,8 +23,6 @@
     "test": "cucumber-js"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^11.1.0",
-    "@rollup/plugin-node-resolve": "^7.1.3",
     "@webauthn/client": "^0.1.3",
     "assert": "^1.5.0",
     "body-parser": "^1.19.0",
