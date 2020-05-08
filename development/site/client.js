@@ -9,7 +9,7 @@ const makeRequestFrom = registrationForm => ({
     "displayName": registrationForm.userDisplayName.value
   },
   "attestation": "none"
-})
+});
 
 const onRegistrationFormSubmit = async event => {
   event.preventDefault();
@@ -23,8 +23,10 @@ const onRegistrationFormSubmit = async event => {
   }).then(
     response => response.json()
   ).then(
-    data => console.log("Response data:", data)
+    window.solveRegistrationChallenge
+  ).then(
+    console.log
   );
-}
+};
 
 window.onRegistrationFormSubmit = onRegistrationFormSubmit;

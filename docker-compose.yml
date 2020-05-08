@@ -12,7 +12,7 @@ services:
     working_dir: /data/
     # tty needed in order for rollup watch to work.
     tty: true
-    command: rollup development/site/client.js --file development/site/client-bundle.js --format iife --watch
+    command: ./development/bundle-client.sh
 
   dev-https-proxy:
     image: silintl/traefik-https-proxy
