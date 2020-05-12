@@ -1,19 +1,25 @@
-const makeRequestFrom = registrationForm => ({
+const addSubmitListener = (formId, listener) => {
+  document.getElementById(formId).addEventListener("submit", event => {
+    event.preventDefault();
+    listener(event.target);
+  });
+};
+
+const makeRequestFrom = form => ({
   "relyingParty": {
     "id": window.location.hostname,
     "name": "ACME Corp."
   },
   "user": {
-    "id": registrationForm.userId.value,
-    "name": registrationForm.username.value,
-    "displayName": registrationForm.userDisplayName.value
+    "id": form.userId.value,
+    "name": form.username.value,
+    "displayName": form.userDisplayName.value
   },
   "attestation": "none"
 });
 
-const onRegistrationFormSubmit = async event => {
-  event.preventDefault();
-  const registrationRequest = makeRequestFrom(event.target.form);
+const onRegistrationFormSubmit = async form => {
+  const registrationRequest = makeRequestFrom(form);
   fetch('/webauthn', {
     method: 'POST',
     headers: {
@@ -29,4 +35,5 @@ const onRegistrationFormSubmit = async event => {
   );
 };
 
+window.addSubmitListener = addSubmitListener;
 window.onRegistrationFormSubmit = onRegistrationFormSubmit;

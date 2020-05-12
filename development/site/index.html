@@ -4,9 +4,18 @@
   <meta charset="UTF-8">
   <title>Serverless MFA API - dev/testing site</title>
   <style type="text/css">
+    button {
+      margin: 0.5em 0;
+    }
     html { font-size: 16px; }
-    input { width: 50em; }
-    label { display: block; }
+    input {
+      display: block;
+      width: 50em;
+    }
+    label {
+      display: block;
+      margin: 0.5em 0;
+    }
   </style>
   <script src="client-bundle.js"></script>
   <script src="webauthn-client.js"></script>
@@ -15,26 +24,27 @@
   <h1>Serverless MFA API - dev/testing site</h1>
   
   <h2>WebAuthn Registration</h2>
-  <form id="registration-form">
-    <p>
-      <label for="userId">User ID (UUIDv4): </label>
-      <input id="userId" name="userId" value="5c3354f4-a4fe-4612-89e9-93046e85351c" />
-    </p>
-    <p>
-      <label for="username">Username: </label>
-      <input id="username" name="username" value="john_smith" />
-    </p>
-    <p>
-      <label for="userDisplayName">Display name: </label>
-      <input id="userDisplayName" name="userDisplayName" value="John Smith" />
-    </p>
-    <p>
-      <button>Register</button>
-    </p>
+  <form id="webauthn-registration-form">
+    <label>
+      User ID (UUIDv4):
+      <input name="userId" value="5c3354f4-a4fe-4612-89e9-93046e85351c" />
+    </label>
+    
+    <label>
+      Username:
+      <input name="username" value="john_smith" />
+    </label>
+    
+    <label>
+      Display name:
+      <input name="userDisplayName" value="John Smith" />
+    </label>
+    
+    <button>Register</button>
   </form>
 
   <script>
-    document.getElementById("registration-form").addEventListener("click", onRegistrationFormSubmit);
+    addSubmitListener("webauthn-registration-form", onRegistrationFormSubmit);
   </script>
 </body>
 </html>
