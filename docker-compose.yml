@@ -6,7 +6,9 @@ services:
       - ./:/usr/src/app
 
   dev-client-bundle:
-    build: development/.
+    image: local-dev-server
+    depends_on:
+      - dev-server
     volumes:
       - ./:/data/
     working_dir: /data/
@@ -26,6 +28,7 @@ services:
 
   dev-server:
     build: development/.
+    image: local-dev-server
     depends_on:
       - dev-https-proxy
     ports:
