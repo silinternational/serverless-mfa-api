@@ -1,10 +1,7 @@
 'use strict';
 
-const AWS = require('aws-sdk');
 const crypto = require('crypto');
-const dynamoDb = new AWS.DynamoDB.DocumentClient({
-  endpoint: process.env.DYNAMO_DB_ENDPOINT
-});
+const { dynamoDb } = require('../helpers/aws');
 const password = require('../helpers/password.js');
 const response = require ('../helpers/response.js');
 

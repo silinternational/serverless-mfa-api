@@ -1,10 +1,7 @@
 'use strict';
 
 const apiKey = require('../models/api-key.js');
-const AWS = require('aws-sdk');
-const dynamoDb = new AWS.DynamoDB.DocumentClient({
-  endpoint: process.env.DYNAMO_DB_ENDPOINT
-});
+const { dynamoDb } = require('../helpers/aws');
 const encryption = require('../helpers/encryption.js');
 const response = require('../helpers/response.js');
 const u2f = require('u2f');
