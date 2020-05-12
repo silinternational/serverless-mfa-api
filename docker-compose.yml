@@ -31,6 +31,8 @@ services:
     image: local-dev-server
     depends_on:
       - dev-https-proxy
+    env_file:
+      - development/development.env
     ports:
       - "8080:8080"
     volumes:
