@@ -1,5 +1,5 @@
 dev:
-	docker-compose up -d dev-client-bundle dev-server
+	docker-compose up -d dev-client-bundle dev-server dynamodb
 
 dynamodb:
 	docker-compose up -d dynamodb
