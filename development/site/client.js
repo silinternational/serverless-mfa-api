@@ -1,9 +1,26 @@
 const addSubmitListener = (formId, listener) => {
   document.getElementById(formId).addEventListener("submit", event => {
     event.preventDefault();
+    saveInputValues();
     listener(event.target);
   });
 };
+
+const saveInputValues = () => {
+  forEachFormInput(input => {
+    localStorage.setItem(input.name, input.value)
+  })
+}
+
+const restoreInputValues = () => {
+  forEachFormInput(input => {
+    input.value = localStorage.getItem(input.name)
+  })
+}
+
+const forEachFormInput = doThis => {
+  document.querySelectorAll('form input').forEach(doThis)  
+}
 
 const makeRequestFrom = form => ({
   "relyingParty": {
@@ -67,5 +84,6 @@ const onWebauthnRegistrationFormSubmit = async form => {
 };
 
 window.addSubmitListener = addSubmitListener;
-window.onWebauthnRegistrationFormSubmit = onWebauthnRegistrationFormSubmit;
+window.restoreInputValues = restoreInputValues;
 
+window.onWebauthnRegistrationFormSubmit = onWebauthnRegistrationFormSubmit;
