@@ -18,7 +18,7 @@ const makeRequestFrom = form => ({
   "attestation": "none"
 });
 
-const onRegistrationFormSubmit = async form => {
+const onWebauthnRegistrationFormSubmit = async form => {
   const registrationRequest = makeRequestFrom(form);
   fetch('/webauthn', {
     method: 'POST',
@@ -39,9 +39,10 @@ const onRegistrationFormSubmit = async form => {
   }).then(
     window.solveRegistrationChallenge
   ).then(
-    console.log
+    registrationCredential => sendWebauthnRegistrationToServer(registrationRequest.user.id, registrationCredential)
   );
 };
 
 window.addSubmitListener = addSubmitListener;
-window.onRegistrationFormSubmit = onRegistrationFormSubmit;
+window.onWebauthnRegistrationFormSubmit = onWebauthnRegistrationFormSubmit;
+

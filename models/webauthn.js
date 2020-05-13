@@ -33,19 +33,29 @@ const createNewWebauthnRecord = (webauthnRecord, callback) => {
  */
 module.exports.createRegistration = (apiKeyValue, apiSecret, requestData = {}, callback) => {
   console.log('Begin creating WebAuthn registration');
-  
-  try {
-    const result = generateRegistrationChallenge(requestData);
-    response.returnSuccess(result, callback);
-    return;
-  } catch (error) {
-    console.error('Error creating WebAuthn registration. Error: ' + error.message);
-    if (error.message) {
-      response.returnError(400, error.message, callback);
-      return;
-    } else {
-      response.returnError(500, "Unknown error", callback);
+  apiKey.getActivatedApiKey(apiKeyValue, apiSecret, apiKeyError => {
+    if (apiKeyError) {
+      console.log('Unable to get activated API Key in order to create WebAuthn registration:', apiKeyError);
+      response.returnError(401, 'Unauthorized', callback);
       return;
     }
-  }
+  
+    try {
+      const result = generateRegistrationChallenge(requestData);
+    
+      /** @todo Save the `challenge` from that, for comparing later. */
+    
+      response.returnSuccess(result, callback);
+      return;
+    } catch (error) {
+      console.error('Error creating WebAuthn registration. Error: ' + error.message);
+      if (error.message) {
+        response.returnError(400, error.message, callback);
+        return;
+      } else {
+        response.returnError(500, "Unknown error", callback);
+        return;
+      }
+    }
+  });
 };
