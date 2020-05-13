@@ -15,7 +15,7 @@ const makeRequestFrom = form => ({
     "name": form.username.value,
     "displayName": form.userDisplayName.value
   },
-  "attestation": "none"
+  "attestation": "direct" // Preferred "none", but @webauthn/server doesn't support that yet.
 });
 
 const onWebauthnRegistrationFormSubmit = async form => {
