@@ -24,7 +24,7 @@ const forEachFormInput = doThis => {
 
 const makeRequestFrom = form => ({
   "relyingParty": {
-    "id": window.location.hostname,
+    "id": window.psl.parse(window.location.hostname).domain,
     "name": "ACME Corp."
   },
   "user": {
