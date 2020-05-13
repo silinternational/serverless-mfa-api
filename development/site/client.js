@@ -22,7 +22,7 @@ const forEachFormInput = doThis => {
   document.querySelectorAll('form input').forEach(doThis)  
 }
 
-const makeRequestFrom = form => ({
+const makeRegistrationRequestFrom = form => ({
   "relyingParty": {
     "id": window.psl.parse(window.location.hostname).domain,
     "name": "ACME Corp."
@@ -35,6 +35,15 @@ const makeRequestFrom = form => ({
   "attestation": "direct" // Preferred "none", but @webauthn/server doesn't support that yet.
 });
 
+const rejectIfNotOk = async response => {
+  if (!response.ok) {
+    console.log('Not ok:', response)
+    throw new Error(JSON.stringify(await response.json()))
+  }
+  console.log('Ok:', response)
+  return response
+};
+
 const sendWebauthnRegistrationToServer = async (apiKey, apiSecret, userUuid, registrationCredential) => {
   fetch('/webauthn/' + userUuid, {
     method: 'PUT',
@@ -45,6 +54,8 @@ const sendWebauthnRegistrationToServer = async (apiKey, apiSecret, userUuid, reg
     },
     body: JSON.stringify(registrationCredential)
   }).then(
+    rejectIfNotOk
+  ).then(
     response => response.json()
   ).then(
     registrationResponse => console.log('registrationResponse:', registrationResponse) // TEMP
@@ -52,9 +63,13 @@ const sendWebauthnRegistrationToServer = async (apiKey, apiSecret, userUuid, reg
 };
 
 const onWebauthnRegistrationFormSubmit = async form => {
-  const registrationRequest = makeRequestFrom(form);
+  const registrationRequest = makeRegistrationRequestFrom(form);
   const apiKey = form.apiKey.value;
   const apiSecret = form.apiSecret.value;
+  createWebauthnRegistration(apiKey, apiSecret, registrationRequest)
+};
+
+const createWebauthnRegistration = (apiKey, apiSecret, registrationRequest) => {
   fetch('/webauthn', {
     method: 'POST',
     headers: {
@@ -63,15 +78,11 @@ const onWebauthnRegistrationFormSubmit = async form => {
       'x-mfa-apisecret': apiSecret,
     },
     body: JSON.stringify(registrationRequest)
-  }).then(async response => {
-    console.log("Response:", response);
-    const responseData = await response.json();
-    if (response.ok) {
-      return responseData
-    } else {
-      console.log('Error:', responseData)
-    }
   }).then(
+    rejectIfNotOk
+  ).then(
+    response => response.json()
+  ).then(
     window.solveRegistrationChallenge
   ).then(
     registrationCredential => sendWebauthnRegistrationToServer(
@@ -87,3 +98,7 @@ window.addSubmitListener = addSubmitListener;
 window.restoreInputValues = restoreInputValues;
 
 window.onWebauthnRegistrationFormSubmit = onWebauthnRegistrationFormSubmit;
+
+window.onunhandledrejection = promiseRejectionEvent => {
+  alert(promiseRejectionEvent.reason)
+};
