@@ -23,12 +23,20 @@ const onRegistrationFormSubmit = async form => {
   fetch('/webauthn', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'x-mfa-apikey': form.apiKey.value,
+      'x-mfa-apisecret': form.apiSecret.value,
     },
     body: JSON.stringify(registrationRequest)
+  }).then(async response => {
+    console.log("Response:", response);
+    const responseData = await response.json();
+    if (response.ok) {
+      return responseData
+    } else {
+      console.log('Error:', responseData)
+    }
   }).then(
-    response => response.json()
-  ).then(
     window.solveRegistrationChallenge
   ).then(
     console.log
