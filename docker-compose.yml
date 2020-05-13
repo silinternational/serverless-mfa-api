@@ -35,10 +35,11 @@ services:
       - development/development.env
     ports:
       - "8080:8080"
+      - "9229:9229"
     volumes:
       - ./:/data/
     working_dir: /data/
-    command: supervisor development/server.js
+    command: node --inspect=0.0.0.0:9229 development/server.js
 
   do-full-recovery:
     build: recovery/.
