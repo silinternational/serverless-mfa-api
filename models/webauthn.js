@@ -6,6 +6,7 @@ const encryption = require('../helpers/encryption.js');
 const response = require('../helpers/response.js');
 const uuid = require('uuid');
 const {
+  parseRegisterRequest,
   generateRegistrationChallenge,
 } = require('@webauthn/server');
 
@@ -58,4 +59,48 @@ module.exports.createRegistration = (apiKeyValue, apiSecret, requestData = {}, c
       }
     }
   });
+};
+
+module.exports.validateRegistration = (apiKeyValue, apiSecret, userUuid, registrationCredential = {}, callback) => {
+  console.log('Begin validating WebAuthn registration');
+  try {
+    let { challenge, key } = parseRegisterRequest(registrationCredential);
+    if (key === undefined) {
+      console.error('Error validating WebAuthn registration. Parsing register request returned no key.');
+      response.returnError(400, 'Bad Request', callback);
+      return;
+    } else {
+      const webauthnUuid = uuid.v4();
+      const webauthnRecord = {
+        'uuid': webauthnUuid,
+        'apiKey': apiKeyValue,
+        'challenge': challenge,
+        'encryptedKeyJSON': encryption.encrypt(JSON.stringify(key), apiSecret),
+      };
+      createNewWebauthnRecord(webauthnRecord, (error) => {
+        if (error) {
+          console.error('Failed to create new WebAuthn record.', error);
+          response.returnError(500, 'Internal Server Error', callback);
+          return;
+        }
+  
+        const apiResponse = {
+          'uuid': webauthnUuid
+        };
+  
+        console.log('Successfully created WebAuthn registration for uuid: ' + webauthnUuid);
+        response.returnSuccess(apiResponse, callback);
+        return;
+      });
+    }
+  } catch (error) {
+    console.error('Error validating WebAuthn registration. Error: ' + error.message);
+    if (error.message) {
+      response.returnError(400, error.message, callback);
+      return;
+    } else {
+      response.returnError(500, "Unknown error", callback);
+      return;
+    }
+  }
 };
