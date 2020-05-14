@@ -39,7 +39,7 @@ services:
     volumes:
       - ./:/data/
     working_dir: /data/
-    command: node --inspect=0.0.0.0:9229 development/server.js
+    command: supervisor -- --inspect=0.0.0.0:9229 development/server.js
 
   do-full-recovery:
     build: recovery/.
