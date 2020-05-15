@@ -56,9 +56,7 @@ const sendWebauthnRegistrationToServer = async (apiKey, apiSecret, userUuid, reg
   }).then(
     rejectIfNotOk
   ).then(
-    response => response.json()
-  ).then(
-    registrationResponse => console.log('registrationResponse:', registrationResponse) // TEMP
+    () => alert('Successfully registered WebAuthn key')
   );
 };
 
