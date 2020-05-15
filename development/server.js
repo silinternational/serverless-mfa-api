@@ -58,6 +58,7 @@ app.put('/u2f/:uuid/auth', mapTo(u2fHandlers.validateAuthentication));
 
 app.post('/webauthn', mapTo(webauthnHandlers.createRegistration));
 app.put('/webauthn/:userUuid', mapTo(webauthnHandlers.validateRegistration));
+app.post('/webauthn/:userUuid/auth', mapTo(webauthnHandlers.createAuthentication));
 
 const port = 8080;
 app.listen(port, () => {

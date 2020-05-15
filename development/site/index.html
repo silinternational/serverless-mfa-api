@@ -54,9 +54,30 @@
     <button>Register</button>
   </form>
 
+  <h2>WebAuthn Authentication</h2>
+  <form id="webauthn-authentication-form">
+    <label>
+      API Key:
+      <input name="apiKey" />
+    </label>
+    
+    <label>
+      API Secret:
+      <input name="apiSecret" />
+    </label>
+    
+    <label>
+      User ID (UUIDv4):
+      <input name="userId" />
+    </label>
+    
+    <button>Authenticate</button>
+  </form>
+
   <script>
     restoreInputValues();
     addSubmitListener("webauthn-registration-form", onWebauthnRegistrationFormSubmit);
+    addSubmitListener("webauthn-authentication-form", onWebauthnAuthenticationFormSubmit);
   </script>
 </body>
 </html>

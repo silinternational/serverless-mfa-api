@@ -8,6 +8,7 @@ const response = require('../helpers/response.js');
 const {
   parseRegisterRequest,
   generateRegistrationChallenge,
+  generateLoginChallenge,
 } = require('@webauthn/server');
 
 const createNewWebauthnRecord = (webauthnRecord, callback) => {
@@ -44,6 +45,59 @@ function recordWebauthnRegistrationChallenge(uuid, apiKeyValue, apiSecret, regis
     }
   });
 }
+
+module.exports.createAuthentication = (apiKeyValue, apiSecret, userUuid, callback) => {
+  console.log('Begin creating WebAuthn authentication');
+  apiKey.getActivatedApiKey(apiKeyValue, apiSecret, apiKeyError => {
+    if (apiKeyError) {
+      console.log('Unable to get activated API Key in order to create WebAuthn authentication:', apiKeyError);
+      response.returnError(401, 'Unauthorized', callback);
+      return;
+    }
+    
+    if (! validator.isUUID(userUuid)) {
+      console.log('The given User ID must be a UUID when creating a WebAuthn authentication:', userUuid);
+      response.returnError(400, 'User ID must be a UUID', callback);
+      return;
+    }
+    
+    getWebauthnRecord(userUuid, apiKeyValue, (error, webauthnRecord) => {
+      if (error) {
+        console.error('Error while getting WebAuthn record for creation an authentication.', error);
+        response.returnError(500, 'Internal Server Error', callback);
+        return;
+      }
+
+      if (!webauthnRecord || (webauthnRecord.apiKey !== apiKeyValue)) {
+        console.log('API Key has no such WebAuthn uuid.');
+        response.returnError(404, 'No WebAuthn record found with that uuid for that API Key.', callback);
+        return;
+      }
+
+      const encryptedKeyJSON = webauthnRecord.encryptedKeyJSON;
+      if (!encryptedKeyJSON) {
+        console.log('No encryptedKeyJSON found on that WebAuthn record.');
+        response.returnError(401, 'Unauthorized', callback);
+        return;
+      }
+
+      encryption.decrypt(encryptedKeyJSON, apiSecret, (error, keyJSON) => {
+        if (error) {
+          console.error('Error decrypting keyJSON to create WebAuthn authentication:', error);
+          response.returnError(500, 'Internal Server Error', callback);
+          return;
+        }
+  
+        const key = JSON.parse(keyJSON);
+        const loginChallenge = generateLoginChallenge(key);
+  
+        console.log('Successfully created WebAuthn authentication for User UUID: ' + userUuid);
+        response.returnSuccess(loginChallenge, callback);
+        return;
+      });
+    });
+  });
+};
 
 /**
  * Returns an object defining the options to use when creating a public-key

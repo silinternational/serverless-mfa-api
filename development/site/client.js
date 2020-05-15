@@ -60,11 +60,34 @@ const sendWebauthnRegistrationToServer = async (apiKey, apiSecret, userUuid, reg
   );
 };
 
+const onWebauthnAuthenticationFormSubmit = async form => {
+  const apiKey = form.apiKey.value;
+  const apiSecret = form.apiSecret.value;
+  const userUuid = form.userId.value;
+  createWebauthnAuthentication(apiKey, apiSecret, userUuid)
+};
+
 const onWebauthnRegistrationFormSubmit = async form => {
   const registrationRequest = makeRegistrationRequestFrom(form);
   const apiKey = form.apiKey.value;
   const apiSecret = form.apiSecret.value;
   createWebauthnRegistration(apiKey, apiSecret, registrationRequest)
+};
+
+const createWebauthnAuthentication = (apiKey, apiSecret, userUuid) => {
+  fetch('/webauthn/' + userUuid + '/auth', {
+    method: 'POST',
+    headers: {
+      'x-mfa-apikey': apiKey,
+      'x-mfa-apisecret': apiSecret,
+    },
+  }).then(
+    rejectIfNotOk
+  ).then(
+    response => response.json()
+  ).then(
+    console.log // TEMP
+  );
 };
 
 const createWebauthnRegistration = (apiKey, apiSecret, registrationRequest) => {
@@ -96,6 +119,7 @@ window.addSubmitListener = addSubmitListener;
 window.restoreInputValues = restoreInputValues;
 
 window.onWebauthnRegistrationFormSubmit = onWebauthnRegistrationFormSubmit;
+window.onWebauthnAuthenticationFormSubmit = onWebauthnAuthenticationFormSubmit;
 
 window.onunhandledrejection = promiseRejectionEvent => {
   alert(promiseRejectionEvent.reason)
