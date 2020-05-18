@@ -208,7 +208,7 @@ module.exports.validateRegistration = (apiKeyValue, apiSecret, userUuid, registr
                 return;
               }
               
-              console.log('Successfully created WebAuthn registration for User UUID: ' + userUuid);
+              console.log('Successfully validated WebAuthn registration for User UUID: ' + userUuid);
               response.returnSuccess(null, callback);
               return;
             });
