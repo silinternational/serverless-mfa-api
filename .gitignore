@@ -13,3 +13,15 @@ jspm_packages
 
 # Temporary copy of backups (used during Disaster Recovery)
 /recovery/TempCopyOfBackups
+
+# JS files generated or copied during local development (see Makefile)
+/development/site/client-bundle.js
+/development/site/psl.min.js
+/development/site/webauthn-client.js
+
+# Folder with cert files used for dev-server https-proxy / traefik
+development/cert
+
+# Local environment variables files, typically with secrets
+local.env
+*.local.env
