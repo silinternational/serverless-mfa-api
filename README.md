@@ -267,7 +267,11 @@ gulp restore \
 To run this locally (such as for development)...
 
 1. Open a terminal to **THIS** repo's root folder and run the following:
-   - `make dynamodb-tables` (NOTE: You may need to run this twice.)
+   - `make dynamodb-tables`
+     * NOTE: You may need to run this twice. If it gives an error message,
+       trying again should work. I think it's a timing issue, where it tries to
+       create the dynamodb tables before the local dynamodb is _actually_ up
+       enough to be ready for interaction.
    - `make dev-server`
 2. Add and activate api-key entry for yourself in your local serverless-mfa-api:
    - Submit a `POST` to <https://localhost:8080/prod/api-key> with a JSON body
