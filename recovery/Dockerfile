@@ -6,4 +6,4 @@ RUN unzip awscli-bundle.zip
 RUN ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
 
 # Install the Serverless Framework
-RUN npm install -g serverless
+RUN npm install -g serverless@1
