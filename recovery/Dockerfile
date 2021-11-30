@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:12
 
 # Install the AWS CLI
 RUN curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
