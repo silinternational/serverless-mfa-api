@@ -309,6 +309,26 @@ To run this locally (such as for development)...
    ```
 5. Bring up the `idp-in-a-box` repo. See that repo's README.md for instructions.
 
+## Serverless
+
+To start a local container for development of Serverless configuration:
+
+```
+docker-compose run --rm dev bash
+```
+
+## Credential Rotation
+
+### AWS Serverless User
+
+1. Use the Terraform CLI to taint the old access key
+```
+terraform taint module.serverless-user.aws_iam_access_key.serverless
+```
+2. Run a new plan on Terraform Cloud
+3. Review the new plan and apply if it is correct
+4. Copy the new key and secret from the Terraform output into Codeship
+
 ## Glossary
 
 - `API Key`: A hex string used to identify calls to most of the endpoints on

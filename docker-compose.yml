@@ -1,7 +1,8 @@
 version: "3"
+
 services:
   do-full-recovery:
-    build: recovery/.
+    build: recovery
     volumes:
       - ./:/data
     working_dir: /data
@@ -11,3 +12,12 @@ services:
     image: amazon/dynamodb-local
     ports:
       - "8000:8000"
+
+  dev:
+    build: development
+    env_file:
+      - ./local.env
+    volumes:
+      - ./:/data
+    working_dir: /data
+

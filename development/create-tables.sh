@@ -2,6 +2,8 @@
 
 set -e
 
+set -x
+
 aws dynamodb create-table \
   --table-name development_server_api-key \
   --attribute-definitions AttributeName=value,AttributeType=S \
