@@ -25,3 +25,6 @@ development/cert
 # Local environment variables files, typically with secrets
 local.env
 *.local.env
+
+# Terraform
+.terraform/
