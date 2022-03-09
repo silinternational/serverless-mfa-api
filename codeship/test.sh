@@ -12,4 +12,4 @@ npm test
 serverless --version
 
 # Validate Serverless config
-serverless info
+serverless info --conceal
