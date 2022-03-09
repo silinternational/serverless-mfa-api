@@ -1,6 +1,6 @@
 service: mfa-api
 
-frameworkVersion: ^3.7.0
+frameworkVersion: ^3.7
 
 provider:
   name: aws
