@@ -10,7 +10,7 @@ module "serverless-user" {
   aws_region         = var.aws_region
   enable_api_gateway = true
 
-  extra_policies = [local.s3_policy, local.api_gateway_policy]
+  extra_policies = [local.s3_policy]
 }
 
 output "serverless-access-key-id" {
@@ -33,24 +33,6 @@ locals {
         ],
         "Resource" : [
           "arn:aws:s3:::mfa-api-*-serverlessdeploymentbucket*",
-        ]
-      },
-    ]
-  })
-
-  api_gateway_policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "apigateway:UpdateRestApiPolicy",
-        ],
-        "Resource" : [
-          // dev-mfa-api
-          "arn:aws:apigateway:${var.aws_region}:*:restapis/7f2jflg37i",
-          // prod-mfa-api
-          "arn:aws:apigateway:${var.aws_region}:*:restapis/7hk96xvik6",
         ]
       },
     ]
