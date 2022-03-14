@@ -15,7 +15,8 @@ For details about the various API endpoints, see
     must be provided as an `x-api-key` header in the HTTP request.
 - We create a new API Key and email it to that email address.
   * NOTE: At the moment, we do not actually send that email, since our use case
-    is so limited that we can simply look up the API Key in the database.
+    is so limited that we can simply look up the API Key in the database. For
+    local development, run `make list-dev-api-keys` to see it.
 - The consumer does a `POST` to `/api-key/activate`, providing the email address
   and the API Key.
 - We respond with an API Secret (which is actually an AES key, which we will use
@@ -260,6 +261,73 @@ gulp restore \
     --restoretime 1516918200000
 ```
 (Note: The restore time is a JavaScript timestamp, in milliseconds.)
+
+## Running locally
+
+To run this locally (such as for development)...
+
+1. Open a terminal to **THIS** repo's root folder and run the following:
+   - `make dynamodb-tables`
+     * NOTE: You may need to run this twice. If it gives an error message,
+       trying again should work. I think it's a timing issue, where it tries to
+       create the dynamodb tables before the local dynamodb is _actually_ up
+       enough to be ready for interaction.
+   - `make dev-server`
+2. Add and activate api-key entry for yourself in your local serverless-mfa-api:
+   - Submit a `POST` to <https://localhost:8080/prod/api-key> with a JSON body
+     like the following:
+     ```json
+     { "email": "local@example.com" }
+     ```
+     It should return a `204 No Content` response.
+   - Run `make list-dev-api-keys`, and copy the "value" parameter's value.
+   - Do a `POST` to <https://localhost:8080/prod/api-key/activate>, with a JSON
+     body like the following:
+     ```json
+     {
+     "email": "local@example.com",
+     "apiKey": "the-value-parameter-from-the-dynamo-db-table"
+     }
+     ```
+     It should return a `200 OK` with a JSON body containing an apiSecret that
+     you will need. When copying that value, make sure you include any trailing
+     equals signs (`=`).
+3. Clone the <https://github.com/silinternational/idp-in-a-box> repo.
+4. Put the apiSecret returned (including any trailing `=` signs) and the apiKey
+   value you used in the JSON body into your local idp-in-a-box code's
+   `/docker-compose/broker/local.env` file, both for the `MFA_TOTP_*` and
+   `MFA_U2F_*` environment variables, something like this (but using **YOUR**
+   values for the apiKey and apiSecret entries, not these dummy/sample values):
+   ```
+   MFA_TOTP_apiBaseUrl=http://localhost:8080/
+   MFA_TOTP_apiKey=347a15dc60f014bdd93e4fc59aab607b022c8e19
+   MFA_TOTP_apiSecret=za3c5Op8XgQcWNK16Rg6Th3ndmJ2ZTGL4uEldAJxDes=
+   
+   MFA_U2F_apiBaseUrl=http://localhost:8080/
+   MFA_U2F_apiKey=347a15dc60f014bdd93e4fc59aab607b022c8e19
+   MFA_U2F_apiSecret=za3c5Op8XgQcWNK16Rg6Th3ndmJ2ZTGL4uEldAJxDes= 
+   ```
+5. Bring up the `idp-in-a-box` repo. See that repo's README.md for instructions.
+
+## Serverless
+
+To start a local container for development of Serverless configuration:
+
+```
+docker-compose run --rm dev bash
+```
+
+## Credential Rotation
+
+### AWS Serverless User
+
+1. Use the Terraform CLI to taint the old access key
+```
+terraform taint module.serverless-user.aws_iam_access_key.serverless
+```
+2. Run a new plan on Terraform Cloud
+3. Review the new plan and apply if it is correct
+4. Copy the new key and secret from the Terraform output into Codeship
 
 ## Glossary
 

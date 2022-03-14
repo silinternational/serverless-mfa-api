@@ -1,10 +1,10 @@
-service: ${opt:service, 'mfa-api'}
+service: mfa-api
 
-frameworkVersion: ">=1.21.0 <2.0.0"
+frameworkVersion: ^3.7
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs12.x
   timeout: 30
 
   # Experimented with various memory sizes. Manually calling the totpValidate
@@ -13,11 +13,14 @@ provider:
   #   256 MB = 71 ms
   #   128 MB = 159 ms
   memorySize: 512
-  apiKeys:
+  apiGateway:
+    apiKeys:
     - ${self:custom.namespace}_global
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
+  iam:
+    role:
+      statements:
+      - Effect: Allow
+        Action:
         - dynamodb:DescribeTable
         - dynamodb:Query
         - dynamodb:Scan
@@ -25,18 +28,17 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.namespace}_*"
+        Resource: "arn:aws:dynamodb:${aws:region}:*:table/${self:custom.namespace}_*"
 
 custom:
-  stage: ${opt:stage, self:provider.stage}
-  namespace: ${self:service}_${self:custom.stage}
+  namespace: ${self:service}_${sls:stage}
   apiKeyTable: ${self:custom.namespace}_api-key
   totpTable: ${self:custom.namespace}_totp
   u2fTable: ${self:custom.namespace}_u2f
 
 package:
-  exclude:
-    - node_modules/aws-sdk/**
+  patterns:
+    - '!node_modules/aws-sdk/**'
 
 functions:
   apiKeyActivate:
@@ -179,32 +181,42 @@ resources:
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.u2fTable}
     ApiKeyActivateLogGroup:
+      Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
     ApiKeyCreateLogGroup:
+      Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
     TotpCreateLogGroup:
+      Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
     TotpDeleteLogGroup:
+      Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
     TotpValidateLogGroup:
+      Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
     U2fCreateAuthenticationLogGroup:
+      Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
     U2fCreateRegistrationLogGroup:
+      Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
     U2fDeleteLogGroup:
+      Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
     U2fValidateAuthenticationLogGroup:
+      Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
     U2fValidateRegistrationLogGroup:
+      Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
