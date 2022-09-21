@@ -3,9 +3,8 @@
 # Exit script with error if any step fails.
 set -e
 
-# Specify the desired version of NodeJS. Should match package.json, Dockerfiles,
-# and serverless.yml file.
-nvm use 16
+# Check which version of NodeJS we're running.
+node --version
 
 npm ci --no-fund -g serverless@3
 npm ci --no-fund
