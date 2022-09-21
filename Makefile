@@ -14,4 +14,4 @@ do-full-recovery:
 	docker-compose run --rm do-full-recovery
 
 test:
-	npm test
+	docker-compose run --rm dev bash -c "npm ci && npm test"
