@@ -7,5 +7,5 @@ set -e
 # and serverless.yml file.
 nvm use 16
 
-npm install --no-fund -g serverless@3
-npm install --no-fund
+npm ci --no-fund -g serverless@3
+npm ci --no-fund
