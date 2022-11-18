@@ -4,7 +4,7 @@
  */
 module "serverless-user" {
   source  = "silinternational/serverless-user/aws"
-  version = "0.1.1"
+  version = "0.1.2"
 
   app_name           = "mfa-api"
   aws_region         = var.aws_region
