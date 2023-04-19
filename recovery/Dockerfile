@@ -12,4 +12,4 @@ RUN unzip awscli-bundle.zip
 RUN ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
 
 # Install the Serverless Framework
-RUN npm install -g serverless@3 && echo "aws version: " && aws --version
+RUN npm install -g serverless@3.25 && echo "aws version: " && aws --version

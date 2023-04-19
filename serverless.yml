@@ -4,7 +4,7 @@ frameworkVersion: ^3.7
 
 provider:
   name: aws
-  runtime: nodejs16.x
+  runtime: nodejs18.x
   timeout: 30
 
   # Experimented with various memory sizes. Manually calling the totpValidate
@@ -35,10 +35,6 @@ custom:
   apiKeyTable: ${self:custom.namespace}_api-key
   totpTable: ${self:custom.namespace}_totp
   u2fTable: ${self:custom.namespace}_u2f
-
-package:
-  patterns:
-    - '!node_modules/aws-sdk/**'
 
 functions:
   apiKeyActivate:
