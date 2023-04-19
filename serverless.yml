@@ -36,10 +36,6 @@ custom:
   totpTable: ${self:custom.namespace}_totp
   u2fTable: ${self:custom.namespace}_u2f
 
-package:
-  patterns:
-    - '!node_modules/aws-sdk/**'
-
 functions:
   apiKeyActivate:
     handler: handlers/api-key.activate
