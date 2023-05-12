@@ -27,5 +27,5 @@ variable "app_environment" {
 variable "app_name" {
   description = "app name to use for the itse_app_name tag"
   type        = string
-  default     = "serverless-mfa-api"
+  default     = "idp"
 }
