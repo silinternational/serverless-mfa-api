@@ -1,0 +1,4 @@
+{
+  "dev": "staging",
+  "prod": "production"
+}

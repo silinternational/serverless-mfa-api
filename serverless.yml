@@ -47,6 +47,10 @@ functions:
           path: api-key/activate
           method: post
           private: true
+    tags:
+      itse_app_name: ${self:service}
+      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_customer: "shared"
   apiKeyCreate:
     handler: handlers/api-key.create
     name: ${self:custom.namespace}_apiKeyCreate
@@ -57,6 +61,10 @@ functions:
           path: api-key
           method: post
           private: true
+    tags:
+      itse_app_name: ${self:service}
+      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_customer: "shared"
   totpCreate:
     handler: handlers/totp.create
     name: ${self:custom.namespace}_totpCreate
@@ -67,6 +75,10 @@ functions:
       - http:
           path: totp
           method: post
+    tags:
+      itse_app_name: ${self:service}
+      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_customer: "shared"
   totpDelete:
     handler: handlers/totp.delete
     name: ${self:custom.namespace}_totpDelete
@@ -77,6 +89,10 @@ functions:
       - http:
           path: totp/{uuid}
           method: delete
+    tags:
+      itse_app_name: ${self:service}
+      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_customer: "shared"
   totpValidate:
     handler: handlers/totp.validate
     name: ${self:custom.namespace}_totpValidate
@@ -87,6 +103,10 @@ functions:
       - http:
           path: totp/{uuid}/validate
           method: post
+    tags:
+      itse_app_name: ${self:service}
+      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_customer: "shared"
   u2fCreateAuthentication:
     handler: handlers/u2f.createAuthentication
     name: ${self:custom.namespace}_u2fCreateAuthentication
@@ -97,6 +117,10 @@ functions:
       - http:
           path: u2f/{uuid}/auth
           method: post
+    tags:
+      itse_app_name: ${self:service}
+      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_customer: "shared"
   u2fCreateRegistration:
     handler: handlers/u2f.createRegistration
     name: ${self:custom.namespace}_u2fCreateRegistration
@@ -107,6 +131,10 @@ functions:
       - http:
           path: u2f
           method: post
+    tags:
+      itse_app_name: ${self:service}
+      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_customer: "shared"
   u2fDelete:
     handler: handlers/u2f.delete
     name: ${self:custom.namespace}_u2fDelete
@@ -117,6 +145,10 @@ functions:
       - http:
           path: u2f/{uuid}
           method: delete
+    tags:
+      itse_app_name: ${self:service}
+      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_customer: "shared"
   u2fValidateAuthentication:
     handler: handlers/u2f.validateAuthentication
     name: ${self:custom.namespace}_u2fValidateAuthentication
@@ -127,6 +159,10 @@ functions:
       - http:
           path: u2f/{uuid}/auth
           method: put
+    tags:
+      itse_app_name: ${self:service}
+      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_customer: "shared"
   u2fValidateRegistration:
     handler: handlers/u2f.validateRegistration
     name: ${self:custom.namespace}_u2fValidateRegistration
@@ -137,6 +173,10 @@ functions:
       - http:
           path: u2f/{uuid}
           method: put
+    tags:
+      itse_app_name: ${self:service}
+      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_customer: "shared"
 
 resources:
   Resources:
@@ -152,6 +192,13 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.apiKeyTable}
+        Tags:
+          - Key: "itse_app_name"
+            Value: ${self:service}
+          - Key: "itse_app_env"
+            Value: ${file(./stages.json):${sls:stage}}
+          - Key: "itse_app_customer"
+            Value: "shared"
     TotpDynamoDbTable:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
@@ -164,6 +211,13 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.totpTable}
+        Tags:
+          - Key: "itse_app_name"
+            Value: ${self:service}
+          - Key: "itse_app_env"
+            Value: ${file(./stages.json):${sls:stage}}
+          - Key: "itse_app_customer"
+            Value: "shared"
     U2fDynamoDbTable:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
@@ -176,43 +230,120 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.u2fTable}
+        Tags:
+          - Key: "itse_app_name"
+            Value: ${self:service}
+          - Key: "itse_app_env"
+            Value: ${file(./stages.json):${sls:stage}}
+          - Key: "itse_app_customer"
+            Value: "shared"
     ApiKeyActivateLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
+        Tags:
+          - Key: "itse_app_name"
+            Value: ${self:service}
+          - Key: "itse_app_env"
+            Value: ${file(./stages.json):${sls:stage}}
+          - Key: "itse_app_customer"
+            Value: "shared"
     ApiKeyCreateLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
+        Tags:
+          - Key: "itse_app_name"
+            Value: ${self:service}
+          - Key: "itse_app_env"
+            Value: ${file(./stages.json):${sls:stage}}
+          - Key: "itse_app_customer"
+            Value: "shared"
     TotpCreateLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
+        Tags:
+          - Key: "itse_app_name"
+            Value: ${self:service}
+          - Key: "itse_app_env"
+            Value: ${file(./stages.json):${sls:stage}}
+          - Key: "itse_app_customer"
+            Value: "shared"
     TotpDeleteLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
+        Tags:
+          - Key: "itse_app_name"
+            Value: ${self:service}
+          - Key: "itse_app_env"
+            Value: ${file(./stages.json):${sls:stage}}
+          - Key: "itse_app_customer"
+            Value: "shared"
     TotpValidateLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
+        Tags:
+          - Key: "itse_app_name"
+            Value: ${self:service}
+          - Key: "itse_app_env"
+            Value: ${file(./stages.json):${sls:stage}}
+          - Key: "itse_app_customer"
+            Value: "shared"
     U2fCreateAuthenticationLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
+        Tags:
+          - Key: "itse_app_name"
+            Value: ${self:service}
+          - Key: "itse_app_env"
+            Value: ${file(./stages.json):${sls:stage}}
+          - Key: "itse_app_customer"
+            Value: "shared"
     U2fCreateRegistrationLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
+        Tags:
+          - Key: "itse_app_name"
+            Value: ${self:service}
+          - Key: "itse_app_env"
+            Value: ${file(./stages.json):${sls:stage}}
+          - Key: "itse_app_customer"
+            Value: "shared"
     U2fDeleteLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
+        Tags:
+          - Key: "itse_app_name"
+            Value: ${self:service}
+          - Key: "itse_app_env"
+            Value: ${file(./stages.json):${sls:stage}}
+          - Key: "itse_app_customer"
+            Value: "shared"
     U2fValidateAuthenticationLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
+        Tags:
+          - Key: "itse_app_name"
+            Value: ${self:service}
+          - Key: "itse_app_env"
+            Value: ${file(./stages.json):${sls:stage}}
+          - Key: "itse_app_customer"
+            Value: "shared"
     U2fValidateRegistrationLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
+        Tags:
+          - Key: "itse_app_name"
+            Value: ${self:service}
+          - Key: "itse_app_env"
+            Value: ${file(./stages.json):${sls:stage}}
+          - Key: "itse_app_customer"
+            Value: "shared"
