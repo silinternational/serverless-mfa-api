@@ -9,4 +9,20 @@ module "serverless-user" {
   app_name           = "mfa-api"
   aws_region         = var.aws_region
   enable_api_gateway = true
+  extra_policies = [
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "dynamodb:DescribeTable"
+          ],
+          "Resource" : [
+            "arn:aws:dynamodb:*:*:table/mfa-api_*"
+          ]
+        }
+      ]
+    }
+  ]
 }
