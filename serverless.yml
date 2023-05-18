@@ -35,6 +35,8 @@ custom:
   apiKeyTable: ${self:custom.namespace}_api-key
   totpTable: ${self:custom.namespace}_totp
   u2fTable: ${self:custom.namespace}_u2f
+  dev_env: staging
+  prod_env: production
 
 functions:
   apiKeyActivate:
@@ -49,7 +51,7 @@ functions:
           private: true
     tags:
       itse_app_name: ${self:service}
-      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_env: ${self:custom.${sls:stage}_env}
       itse_app_customer: "shared"
       managed_by: "serverless"
   apiKeyCreate:
@@ -64,7 +66,7 @@ functions:
           private: true
     tags:
       itse_app_name: ${self:service}
-      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_env: ${self:custom.${sls:stage}_env}
       itse_app_customer: "shared"
       managed_by: "serverless"
   totpCreate:
@@ -79,7 +81,7 @@ functions:
           method: post
     tags:
       itse_app_name: ${self:service}
-      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_env: ${self:custom.${sls:stage}_env}
       itse_app_customer: "shared"
       managed_by: "serverless"
   totpDelete:
@@ -94,7 +96,7 @@ functions:
           method: delete
     tags:
       itse_app_name: ${self:service}
-      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_env: ${self:custom.${sls:stage}_env}
       itse_app_customer: "shared"
       managed_by: "serverless"
   totpValidate:
@@ -109,7 +111,7 @@ functions:
           method: post
     tags:
       itse_app_name: ${self:service}
-      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_env: ${self:custom.${sls:stage}_env}
       itse_app_customer: "shared"
       managed_by: "serverless"
   u2fCreateAuthentication:
@@ -124,7 +126,7 @@ functions:
           method: post
     tags:
       itse_app_name: ${self:service}
-      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_env: ${self:custom.${sls:stage}_env}
       itse_app_customer: "shared"
       managed_by: "serverless"
   u2fCreateRegistration:
@@ -139,7 +141,7 @@ functions:
           method: post
     tags:
       itse_app_name: ${self:service}
-      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_env: ${self:custom.${sls:stage}_env}
       itse_app_customer: "shared"
       managed_by: "serverless"
   u2fDelete:
@@ -154,7 +156,7 @@ functions:
           method: delete
     tags:
       itse_app_name: ${self:service}
-      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_env: ${self:custom.${sls:stage}_env}
       itse_app_customer: "shared"
       managed_by: "serverless"
   u2fValidateAuthentication:
@@ -169,7 +171,7 @@ functions:
           method: put
     tags:
       itse_app_name: ${self:service}
-      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_env: ${self:custom.${sls:stage}_env}
       itse_app_customer: "shared"
       managed_by: "serverless"
   u2fValidateRegistration:
@@ -184,7 +186,7 @@ functions:
           method: put
     tags:
       itse_app_name: ${self:service}
-      itse_app_env: ${file(./stages.json):${sls:stage}}
+      itse_app_env: ${self:custom.${sls:stage}_env}
       itse_app_customer: "shared"
       managed_by: "serverless"
 
@@ -206,7 +208,7 @@ resources:
           - Key: "itse_app_name"
             Value: ${self:service}
           - Key: "itse_app_env"
-            Value: ${file(./stages.json):${sls:stage}}
+            Value: ${self:custom.${sls:stage}_env}
           - Key: "itse_app_customer"
             Value: "shared"
           - Key: "managed_by"
@@ -227,7 +229,7 @@ resources:
           - Key: "itse_app_name"
             Value: ${self:service}
           - Key: "itse_app_env"
-            Value: ${file(./stages.json):${sls:stage}}
+            Value: ${self:custom.${sls:stage}_env}
           - Key: "itse_app_customer"
             Value: "shared"
           - Key: "managed_by"
@@ -248,7 +250,7 @@ resources:
           - Key: "itse_app_name"
             Value: ${self:service}
           - Key: "itse_app_env"
-            Value: ${file(./stages.json):${sls:stage}}
+            Value: ${self:custom.${sls:stage}_env}
           - Key: "itse_app_customer"
             Value: "shared"
           - Key: "managed_by"
@@ -261,7 +263,7 @@ resources:
           - Key: "itse_app_name"
             Value: ${self:service}
           - Key: "itse_app_env"
-            Value: ${file(./stages.json):${sls:stage}}
+            Value: ${self:custom.${sls:stage}_env}
           - Key: "itse_app_customer"
             Value: "shared"
           - Key: "managed_by"
@@ -274,7 +276,7 @@ resources:
           - Key: "itse_app_name"
             Value: ${self:service}
           - Key: "itse_app_env"
-            Value: ${file(./stages.json):${sls:stage}}
+            Value: ${self:custom.${sls:stage}_env}
           - Key: "itse_app_customer"
             Value: "shared"
           - Key: "managed_by"
@@ -287,7 +289,7 @@ resources:
           - Key: "itse_app_name"
             Value: ${self:service}
           - Key: "itse_app_env"
-            Value: ${file(./stages.json):${sls:stage}}
+            Value: ${self:custom.${sls:stage}_env}
           - Key: "itse_app_customer"
             Value: "shared"
           - Key: "managed_by"
@@ -300,7 +302,7 @@ resources:
           - Key: "itse_app_name"
             Value: ${self:service}
           - Key: "itse_app_env"
-            Value: ${file(./stages.json):${sls:stage}}
+            Value: ${self:custom.${sls:stage}_env}
           - Key: "itse_app_customer"
             Value: "shared"
           - Key: "managed_by"
@@ -313,7 +315,7 @@ resources:
           - Key: "itse_app_name"
             Value: ${self:service}
           - Key: "itse_app_env"
-            Value: ${file(./stages.json):${sls:stage}}
+            Value: ${self:custom.${sls:stage}_env}
           - Key: "itse_app_customer"
             Value: "shared"
           - Key: "managed_by"
@@ -326,7 +328,7 @@ resources:
           - Key: "itse_app_name"
             Value: ${self:service}
           - Key: "itse_app_env"
-            Value: ${file(./stages.json):${sls:stage}}
+            Value: ${self:custom.${sls:stage}_env}
           - Key: "itse_app_customer"
             Value: "shared"
           - Key: "managed_by"
@@ -339,7 +341,7 @@ resources:
           - Key: "itse_app_name"
             Value: ${self:service}
           - Key: "itse_app_env"
-            Value: ${file(./stages.json):${sls:stage}}
+            Value: ${self:custom.${sls:stage}_env}
           - Key: "itse_app_customer"
             Value: "shared"
           - Key: "managed_by"
@@ -352,7 +354,7 @@ resources:
           - Key: "itse_app_name"
             Value: ${self:service}
           - Key: "itse_app_env"
-            Value: ${file(./stages.json):${sls:stage}}
+            Value: ${self:custom.${sls:stage}_env}
           - Key: "itse_app_customer"
             Value: "shared"
           - Key: "managed_by"
@@ -365,7 +367,7 @@ resources:
           - Key: "itse_app_name"
             Value: ${self:service}
           - Key: "itse_app_env"
-            Value: ${file(./stages.json):${sls:stage}}
+            Value: ${self:custom.${sls:stage}_env}
           - Key: "itse_app_customer"
             Value: "shared"
           - Key: "managed_by"
@@ -378,7 +380,7 @@ resources:
           - Key: "itse_app_name"
             Value: ${self:service}
           - Key: "itse_app_env"
-            Value: ${file(./stages.json):${sls:stage}}
+            Value: ${self:custom.${sls:stage}_env}
           - Key: "itse_app_customer"
             Value: "shared"
           - Key: "managed_by"
