@@ -204,7 +204,7 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         Replicas:
-          - Region: "us-east-2" # Temporarily hard-code this as part of an upcoming move.
+          - Region: ${aws:region}
             Tags:
               - Key: "itse_app_name"
                 Value: ${self:service}
