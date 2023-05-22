@@ -28,7 +28,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-        Resource: "arn:aws:dynamodb:${aws:region}:*:table/${self:custom.namespace}_*"
+        Resource: "arn:aws:dynamodb:*:*:table/${self:custom.namespace}_*"
 
 custom:
   namespace: ${self:service}_${sls:stage}
