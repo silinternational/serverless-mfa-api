@@ -61,9 +61,7 @@ module "serverless-user" {
               "iam:TagRole",
               "iam:UntagRole"
             ],
-            "Resource" : [
-              "arn:aws:iam::*:role/*"
-            ]
+            "Resource" : "arn:aws:iam::*:role/*"
           }
         ]
       }
