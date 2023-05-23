@@ -225,6 +225,8 @@ resources:
                 Value: "shared"
               - Key: "managed_by"
                 Value: "serverless"
+        StreamSpecification:
+          StreamViewType: NEW_IMAGE
         TableName: ${self:custom.apiKeyTable}_global
     ApiKeyDynamoDbTable:
       Type: AWS::DynamoDB::Table
