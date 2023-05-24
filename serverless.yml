@@ -37,6 +37,7 @@ custom:
   u2fTable: ${self:custom.namespace}_u2f
   dev_env: staging
   prod_env: production
+  secondaryRegion: ${env:AWS_REGION_SECONDARY, "us-west-2"}
 
 functions:
   apiKeyActivate:
@@ -214,6 +215,18 @@ resources:
                 Value: "shared"
               - Key: "managed_by"
                 Value: "serverless"
+          - Region: ${self:custom.secondaryRegion}
+            Tags:
+              - Key: "itse_app_name"
+                Value: ${self:service}
+              - Key: "itse_app_env"
+                Value: ${self:custom.${sls:stage}_env}
+              - Key: "itse_app_customer"
+                Value: "shared"
+              - Key: "managed_by"
+                Value: "serverless"
+        StreamSpecification:
+          StreamViewType: NEW_IMAGE
         TableName: ${self:custom.apiKeyTable}_global
     ApiKeyDynamoDbTable:
       Type: AWS::DynamoDB::Table
