@@ -52,6 +52,11 @@ custom:
       Value: "shared"
     - Key: "managed_by"
       Value: "serverless"
+  globalTableReplicas:
+    - Region: ${aws:region}
+      Tags: ${self:custom.tableTags}
+    - Region: ${self:custom.secondaryRegion}
+      Tags: ${self:custom.tableTags}
 
 functions:
   apiKeyActivate:
@@ -178,11 +183,7 @@ resources:
           - AttributeName: value
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
-        Replicas:
-          - Region: ${aws:region}
-            Tags: ${self:custom.tableTags}
-          - Region: ${self:custom.secondaryRegion}
-            Tags: ${self:custom.tableTags}
+        Replicas: ${self:custom.globalTableReplicas}
         StreamSpecification:
           StreamViewType: NEW_IMAGE
         TableName: ${self:custom.apiKeyTable}_global
