@@ -200,6 +200,21 @@ resources:
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.apiKeyTable}
         Tags: ${self:custom.resourceTags}
+    TotpDynamoDbGlobalTable:
+      Type: AWS::DynamoDB::GlobalTable
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: uuid
+            AttributeType: S
+        KeySchema:
+          - AttributeName: uuid
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        Replicas: ${self:custom.globalTableReplicas}
+        StreamSpecification:
+          StreamViewType: NEW_IMAGE
+        TableName: ${self:custom.totpTable}_global
     TotpDynamoDbTable:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
