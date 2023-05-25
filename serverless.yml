@@ -28,7 +28,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-        Resource: "arn:aws:dynamodb:${aws:region}:*:table/${self:custom.namespace}_*"
+        Resource: "arn:aws:dynamodb:*:*:table/${self:custom.namespace}_*"
 
 custom:
   namespace: ${self:service}_${sls:stage}
@@ -37,6 +37,7 @@ custom:
   u2fTable: ${self:custom.namespace}_u2f
   dev_env: staging
   prod_env: production
+  secondaryRegion: ${env:AWS_REGION_SECONDARY, "us-west-2"}
 
 functions:
   apiKeyActivate:
@@ -192,6 +193,41 @@ functions:
 
 resources:
   Resources:
+    ApiKeyDynamoDbGlobalTable:
+      Type: AWS::DynamoDB::GlobalTable
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: value
+            AttributeType: S
+        KeySchema:
+          - AttributeName: value
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        Replicas:
+          - Region: ${aws:region}
+            Tags:
+              - Key: "itse_app_name"
+                Value: ${self:service}
+              - Key: "itse_app_env"
+                Value: ${self:custom.${sls:stage}_env}
+              - Key: "itse_app_customer"
+                Value: "shared"
+              - Key: "managed_by"
+                Value: "serverless"
+          - Region: ${self:custom.secondaryRegion}
+            Tags:
+              - Key: "itse_app_name"
+                Value: ${self:service}
+              - Key: "itse_app_env"
+                Value: ${self:custom.${sls:stage}_env}
+              - Key: "itse_app_customer"
+                Value: "shared"
+              - Key: "managed_by"
+                Value: "serverless"
+        StreamSpecification:
+          StreamViewType: NEW_IMAGE
+        TableName: ${self:custom.apiKeyTable}_global
     ApiKeyDynamoDbTable:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
