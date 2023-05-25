@@ -38,6 +38,25 @@ custom:
   dev_env: staging
   prod_env: production
   secondaryRegion: ${env:AWS_REGION_SECONDARY, "us-west-2"}
+  functionTags:
+    itse_app_name: ${self:service}
+    itse_app_env: ${self:custom.${sls:stage}_env}
+    itse_app_customer: "shared"
+    managed_by: "serverless"
+  resourceTags:
+    - Key: "itse_app_name"
+      Value: ${self:service}
+    - Key: "itse_app_env"
+      Value: ${self:custom.${sls:stage}_env}
+    - Key: "itse_app_customer"
+      Value: "shared"
+    - Key: "managed_by"
+      Value: "serverless"
+  globalTableReplicas:
+    - Region: ${aws:region}
+      Tags: ${self:custom.resourceTags}
+    - Region: ${self:custom.secondaryRegion}
+      Tags: ${self:custom.resourceTags}
 
 functions:
   apiKeyActivate:
@@ -50,11 +69,7 @@ functions:
           path: api-key/activate
           method: post
           private: true
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   apiKeyCreate:
     handler: handlers/api-key.create
     name: ${self:custom.namespace}_apiKeyCreate
@@ -65,11 +80,7 @@ functions:
           path: api-key
           method: post
           private: true
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   totpCreate:
     handler: handlers/totp.create
     name: ${self:custom.namespace}_totpCreate
@@ -80,11 +91,7 @@ functions:
       - http:
           path: totp
           method: post
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   totpDelete:
     handler: handlers/totp.delete
     name: ${self:custom.namespace}_totpDelete
@@ -95,11 +102,7 @@ functions:
       - http:
           path: totp/{uuid}
           method: delete
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   totpValidate:
     handler: handlers/totp.validate
     name: ${self:custom.namespace}_totpValidate
@@ -110,11 +113,7 @@ functions:
       - http:
           path: totp/{uuid}/validate
           method: post
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   u2fCreateAuthentication:
     handler: handlers/u2f.createAuthentication
     name: ${self:custom.namespace}_u2fCreateAuthentication
@@ -125,11 +124,7 @@ functions:
       - http:
           path: u2f/{uuid}/auth
           method: post
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   u2fCreateRegistration:
     handler: handlers/u2f.createRegistration
     name: ${self:custom.namespace}_u2fCreateRegistration
@@ -140,11 +135,7 @@ functions:
       - http:
           path: u2f
           method: post
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   u2fDelete:
     handler: handlers/u2f.delete
     name: ${self:custom.namespace}_u2fDelete
@@ -155,11 +146,7 @@ functions:
       - http:
           path: u2f/{uuid}
           method: delete
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   u2fValidateAuthentication:
     handler: handlers/u2f.validateAuthentication
     name: ${self:custom.namespace}_u2fValidateAuthentication
@@ -170,11 +157,7 @@ functions:
       - http:
           path: u2f/{uuid}/auth
           method: put
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   u2fValidateRegistration:
     handler: handlers/u2f.validateRegistration
     name: ${self:custom.namespace}_u2fValidateRegistration
@@ -185,11 +168,7 @@ functions:
       - http:
           path: u2f/{uuid}
           method: put
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
 
 resources:
   Resources:
@@ -204,27 +183,7 @@ resources:
           - AttributeName: value
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
-        Replicas:
-          - Region: ${aws:region}
-            Tags:
-              - Key: "itse_app_name"
-                Value: ${self:service}
-              - Key: "itse_app_env"
-                Value: ${self:custom.${sls:stage}_env}
-              - Key: "itse_app_customer"
-                Value: "shared"
-              - Key: "managed_by"
-                Value: "serverless"
-          - Region: ${self:custom.secondaryRegion}
-            Tags:
-              - Key: "itse_app_name"
-                Value: ${self:service}
-              - Key: "itse_app_env"
-                Value: ${self:custom.${sls:stage}_env}
-              - Key: "itse_app_customer"
-                Value: "shared"
-              - Key: "managed_by"
-                Value: "serverless"
+        Replicas: ${self:custom.globalTableReplicas}
         StreamSpecification:
           StreamViewType: NEW_IMAGE
         TableName: ${self:custom.apiKeyTable}_global
@@ -240,15 +199,7 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.apiKeyTable}
-        Tags:
-          - Key: "itse_app_name"
-            Value: ${self:service}
-          - Key: "itse_app_env"
-            Value: ${self:custom.${sls:stage}_env}
-          - Key: "itse_app_customer"
-            Value: "shared"
-          - Key: "managed_by"
-            Value: "serverless"
+        Tags: ${self:custom.resourceTags}
     TotpDynamoDbTable:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
@@ -261,15 +212,7 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.totpTable}
-        Tags:
-          - Key: "itse_app_name"
-            Value: ${self:service}
-          - Key: "itse_app_env"
-            Value: ${self:custom.${sls:stage}_env}
-          - Key: "itse_app_customer"
-            Value: "shared"
-          - Key: "managed_by"
-            Value: "serverless"
+        Tags: ${self:custom.resourceTags}
     U2fDynamoDbTable:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
@@ -282,142 +225,54 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.u2fTable}
-        Tags:
-          - Key: "itse_app_name"
-            Value: ${self:service}
-          - Key: "itse_app_env"
-            Value: ${self:custom.${sls:stage}_env}
-          - Key: "itse_app_customer"
-            Value: "shared"
-          - Key: "managed_by"
-            Value: "serverless"
+        Tags: ${self:custom.resourceTags}
     ApiKeyActivateLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
-        Tags:
-          - Key: "itse_app_name"
-            Value: ${self:service}
-          - Key: "itse_app_env"
-            Value: ${self:custom.${sls:stage}_env}
-          - Key: "itse_app_customer"
-            Value: "shared"
-          - Key: "managed_by"
-            Value: "serverless"
+        Tags: ${self:custom.resourceTags}
     ApiKeyCreateLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
-        Tags:
-          - Key: "itse_app_name"
-            Value: ${self:service}
-          - Key: "itse_app_env"
-            Value: ${self:custom.${sls:stage}_env}
-          - Key: "itse_app_customer"
-            Value: "shared"
-          - Key: "managed_by"
-            Value: "serverless"
+        Tags: ${self:custom.resourceTags}
     TotpCreateLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
-        Tags:
-          - Key: "itse_app_name"
-            Value: ${self:service}
-          - Key: "itse_app_env"
-            Value: ${self:custom.${sls:stage}_env}
-          - Key: "itse_app_customer"
-            Value: "shared"
-          - Key: "managed_by"
-            Value: "serverless"
+        Tags: ${self:custom.resourceTags}
     TotpDeleteLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
-        Tags:
-          - Key: "itse_app_name"
-            Value: ${self:service}
-          - Key: "itse_app_env"
-            Value: ${self:custom.${sls:stage}_env}
-          - Key: "itse_app_customer"
-            Value: "shared"
-          - Key: "managed_by"
-            Value: "serverless"
+        Tags: ${self:custom.resourceTags}
     TotpValidateLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
-        Tags:
-          - Key: "itse_app_name"
-            Value: ${self:service}
-          - Key: "itse_app_env"
-            Value: ${self:custom.${sls:stage}_env}
-          - Key: "itse_app_customer"
-            Value: "shared"
-          - Key: "managed_by"
-            Value: "serverless"
+        Tags: ${self:custom.resourceTags}
     U2fCreateAuthenticationLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
-        Tags:
-          - Key: "itse_app_name"
-            Value: ${self:service}
-          - Key: "itse_app_env"
-            Value: ${self:custom.${sls:stage}_env}
-          - Key: "itse_app_customer"
-            Value: "shared"
-          - Key: "managed_by"
-            Value: "serverless"
+        Tags: ${self:custom.resourceTags}
     U2fCreateRegistrationLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
-        Tags:
-          - Key: "itse_app_name"
-            Value: ${self:service}
-          - Key: "itse_app_env"
-            Value: ${self:custom.${sls:stage}_env}
-          - Key: "itse_app_customer"
-            Value: "shared"
-          - Key: "managed_by"
-            Value: "serverless"
+        Tags: ${self:custom.resourceTags}
     U2fDeleteLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
-        Tags:
-          - Key: "itse_app_name"
-            Value: ${self:service}
-          - Key: "itse_app_env"
-            Value: ${self:custom.${sls:stage}_env}
-          - Key: "itse_app_customer"
-            Value: "shared"
-          - Key: "managed_by"
-            Value: "serverless"
+        Tags: ${self:custom.resourceTags}
     U2fValidateAuthenticationLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
-        Tags:
-          - Key: "itse_app_name"
-            Value: ${self:service}
-          - Key: "itse_app_env"
-            Value: ${self:custom.${sls:stage}_env}
-          - Key: "itse_app_customer"
-            Value: "shared"
-          - Key: "managed_by"
-            Value: "serverless"
+        Tags: ${self:custom.resourceTags}
     U2fValidateRegistrationLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "30"
-        Tags:
-          - Key: "itse_app_name"
-            Value: ${self:service}
-          - Key: "itse_app_env"
-            Value: ${self:custom.${sls:stage}_env}
-          - Key: "itse_app_customer"
-            Value: "shared"
-          - Key: "managed_by"
-            Value: "serverless"
+        Tags: ${self:custom.resourceTags}
