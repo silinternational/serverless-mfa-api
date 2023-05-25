@@ -228,6 +228,21 @@ resources:
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.totpTable}
         Tags: ${self:custom.resourceTags}
+    U2fDynamoDbGlobalTable:
+      Type: AWS::DynamoDB::GlobalTable
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: uuid
+            AttributeType: S
+        KeySchema:
+          - AttributeName: uuid
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        Replicas: ${self:custom.globalTableReplicas}
+        StreamSpecification:
+          StreamViewType: NEW_IMAGE
+        TableName: ${self:custom.u2fTable}_global
     U2fDynamoDbTable:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
