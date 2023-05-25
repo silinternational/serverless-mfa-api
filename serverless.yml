@@ -38,6 +38,11 @@ custom:
   dev_env: staging
   prod_env: production
   secondaryRegion: ${env:AWS_REGION_SECONDARY, "us-west-2"}
+  functionTags:
+    itse_app_name: ${self:service}
+    itse_app_env: ${self:custom.${sls:stage}_env}
+    itse_app_customer: "shared"
+    managed_by: "serverless"
   tableTags:
     - Key: "itse_app_name"
       Value: ${self:service}
@@ -59,11 +64,7 @@ functions:
           path: api-key/activate
           method: post
           private: true
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   apiKeyCreate:
     handler: handlers/api-key.create
     name: ${self:custom.namespace}_apiKeyCreate
@@ -74,11 +75,7 @@ functions:
           path: api-key
           method: post
           private: true
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   totpCreate:
     handler: handlers/totp.create
     name: ${self:custom.namespace}_totpCreate
@@ -89,11 +86,7 @@ functions:
       - http:
           path: totp
           method: post
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   totpDelete:
     handler: handlers/totp.delete
     name: ${self:custom.namespace}_totpDelete
@@ -104,11 +97,7 @@ functions:
       - http:
           path: totp/{uuid}
           method: delete
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   totpValidate:
     handler: handlers/totp.validate
     name: ${self:custom.namespace}_totpValidate
@@ -119,11 +108,7 @@ functions:
       - http:
           path: totp/{uuid}/validate
           method: post
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   u2fCreateAuthentication:
     handler: handlers/u2f.createAuthentication
     name: ${self:custom.namespace}_u2fCreateAuthentication
@@ -134,11 +119,7 @@ functions:
       - http:
           path: u2f/{uuid}/auth
           method: post
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   u2fCreateRegistration:
     handler: handlers/u2f.createRegistration
     name: ${self:custom.namespace}_u2fCreateRegistration
@@ -149,11 +130,7 @@ functions:
       - http:
           path: u2f
           method: post
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   u2fDelete:
     handler: handlers/u2f.delete
     name: ${self:custom.namespace}_u2fDelete
@@ -164,11 +141,7 @@ functions:
       - http:
           path: u2f/{uuid}
           method: delete
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   u2fValidateAuthentication:
     handler: handlers/u2f.validateAuthentication
     name: ${self:custom.namespace}_u2fValidateAuthentication
@@ -179,11 +152,7 @@ functions:
       - http:
           path: u2f/{uuid}/auth
           method: put
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
   u2fValidateRegistration:
     handler: handlers/u2f.validateRegistration
     name: ${self:custom.namespace}_u2fValidateRegistration
@@ -194,11 +163,7 @@ functions:
       - http:
           path: u2f/{uuid}
           method: put
-    tags:
-      itse_app_name: ${self:service}
-      itse_app_env: ${self:custom.${sls:stage}_env}
-      itse_app_customer: "shared"
-      managed_by: "serverless"
+    tags: ${self:custom.functionTags}
 
 resources:
   Resources:
