@@ -86,7 +86,7 @@ functions:
     name: ${self:custom.namespace}_totpCreate
     environment:
       API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
-      TOTP_TABLE_NAME: ${self:custom.totpTable}
+      TOTP_TABLE_NAME: ${self:custom.totpTable}_global
     events:
       - http:
           path: totp
@@ -97,7 +97,7 @@ functions:
     name: ${self:custom.namespace}_totpDelete
     environment:
       API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
-      TOTP_TABLE_NAME: ${self:custom.totpTable}
+      TOTP_TABLE_NAME: ${self:custom.totpTable}_global
     events:
       - http:
           path: totp/{uuid}
@@ -108,7 +108,7 @@ functions:
     name: ${self:custom.namespace}_totpValidate
     environment:
       API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
-      TOTP_TABLE_NAME: ${self:custom.totpTable}
+      TOTP_TABLE_NAME: ${self:custom.totpTable}_global
     events:
       - http:
           path: totp/{uuid}/validate
