@@ -119,7 +119,7 @@ functions:
     name: ${self:custom.namespace}_u2fCreateAuthentication
     environment:
       API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
-      U2F_TABLE_NAME: ${self:custom.u2fTable}
+      U2F_TABLE_NAME: ${self:custom.u2fTable}_global
     events:
       - http:
           path: u2f/{uuid}/auth
@@ -130,7 +130,7 @@ functions:
     name: ${self:custom.namespace}_u2fCreateRegistration
     environment:
       API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
-      U2F_TABLE_NAME: ${self:custom.u2fTable}
+      U2F_TABLE_NAME: ${self:custom.u2fTable}_global
     events:
       - http:
           path: u2f
@@ -141,7 +141,7 @@ functions:
     name: ${self:custom.namespace}_u2fDelete
     environment:
       API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
-      U2F_TABLE_NAME: ${self:custom.u2fTable}
+      U2F_TABLE_NAME: ${self:custom.u2fTable}_global
     events:
       - http:
           path: u2f/{uuid}
@@ -152,7 +152,7 @@ functions:
     name: ${self:custom.namespace}_u2fValidateAuthentication
     environment:
       API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
-      U2F_TABLE_NAME: ${self:custom.u2fTable}
+      U2F_TABLE_NAME: ${self:custom.u2fTable}_global
     events:
       - http:
           path: u2f/{uuid}/auth
@@ -163,7 +163,7 @@ functions:
     name: ${self:custom.namespace}_u2fValidateRegistration
     environment:
       API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
-      U2F_TABLE_NAME: ${self:custom.u2fTable}
+      U2F_TABLE_NAME: ${self:custom.u2fTable}_global
     events:
       - http:
           path: u2f/{uuid}
