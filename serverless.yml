@@ -63,7 +63,7 @@ functions:
     handler: handlers/api-key.activate
     name: ${self:custom.namespace}_apiKeyActivate
     environment:
-      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
+      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
     events:
       - http:
           path: api-key/activate
@@ -74,7 +74,7 @@ functions:
     handler: handlers/api-key.create
     name: ${self:custom.namespace}_apiKeyCreate
     environment:
-      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
+      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
     events:
       - http:
           path: api-key
@@ -85,8 +85,8 @@ functions:
     handler: handlers/totp.create
     name: ${self:custom.namespace}_totpCreate
     environment:
-      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
-      TOTP_TABLE_NAME: ${self:custom.totpTable}
+      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
+      TOTP_TABLE_NAME: ${self:custom.totpTable}_global
     events:
       - http:
           path: totp
@@ -96,8 +96,8 @@ functions:
     handler: handlers/totp.delete
     name: ${self:custom.namespace}_totpDelete
     environment:
-      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
-      TOTP_TABLE_NAME: ${self:custom.totpTable}
+      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
+      TOTP_TABLE_NAME: ${self:custom.totpTable}_global
     events:
       - http:
           path: totp/{uuid}
@@ -107,8 +107,8 @@ functions:
     handler: handlers/totp.validate
     name: ${self:custom.namespace}_totpValidate
     environment:
-      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
-      TOTP_TABLE_NAME: ${self:custom.totpTable}
+      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
+      TOTP_TABLE_NAME: ${self:custom.totpTable}_global
     events:
       - http:
           path: totp/{uuid}/validate
@@ -118,8 +118,8 @@ functions:
     handler: handlers/u2f.createAuthentication
     name: ${self:custom.namespace}_u2fCreateAuthentication
     environment:
-      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
-      U2F_TABLE_NAME: ${self:custom.u2fTable}
+      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
+      U2F_TABLE_NAME: ${self:custom.u2fTable}_global
     events:
       - http:
           path: u2f/{uuid}/auth
@@ -129,8 +129,8 @@ functions:
     handler: handlers/u2f.createRegistration
     name: ${self:custom.namespace}_u2fCreateRegistration
     environment:
-      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
-      U2F_TABLE_NAME: ${self:custom.u2fTable}
+      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
+      U2F_TABLE_NAME: ${self:custom.u2fTable}_global
     events:
       - http:
           path: u2f
@@ -140,8 +140,8 @@ functions:
     handler: handlers/u2f.delete
     name: ${self:custom.namespace}_u2fDelete
     environment:
-      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
-      U2F_TABLE_NAME: ${self:custom.u2fTable}
+      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
+      U2F_TABLE_NAME: ${self:custom.u2fTable}_global
     events:
       - http:
           path: u2f/{uuid}
@@ -151,8 +151,8 @@ functions:
     handler: handlers/u2f.validateAuthentication
     name: ${self:custom.namespace}_u2fValidateAuthentication
     environment:
-      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
-      U2F_TABLE_NAME: ${self:custom.u2fTable}
+      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
+      U2F_TABLE_NAME: ${self:custom.u2fTable}_global
     events:
       - http:
           path: u2f/{uuid}/auth
@@ -162,8 +162,8 @@ functions:
     handler: handlers/u2f.validateRegistration
     name: ${self:custom.namespace}_u2fValidateRegistration
     environment:
-      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}
-      U2F_TABLE_NAME: ${self:custom.u2fTable}
+      API_KEY_TABLE_NAME: ${self:custom.apiKeyTable}_global
+      U2F_TABLE_NAME: ${self:custom.u2fTable}_global
     events:
       - http:
           path: u2f/{uuid}
