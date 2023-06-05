@@ -90,7 +90,8 @@ To set this up on Codeship, do the following:
 
 ## Automated Backups ##
 While DynamoDB supports On Demand backups as well as Continuous Backups with
-Point-in-time Recovery (PITR), both of these methods restore to a new table
+Point-in-time Recovery (PITR), both of these methods [restore to a new
+table](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery.html)
 rather than restoring to the existing DynamoDB table. While turning on
 Point-in-time Recovery is certainly not a bad idea, we have ended up using an
 alternate approach to make restores easier.
