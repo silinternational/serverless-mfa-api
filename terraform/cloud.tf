@@ -3,7 +3,7 @@ terraform {
     organization = "gtis"
 
     workspaces {
-      name = "serverless-mfa-api"
+      tags = ["app:serverless-mfa-api"]
     }
   }
 }
