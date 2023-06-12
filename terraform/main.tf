@@ -7,7 +7,7 @@ module "serverless-user" {
   source  = "silinternational/serverless-user/aws"
   version = "0.1.3"
 
-  app_name           = "idp"
+  app_name           = "mfa-api"
   aws_region         = var.aws_region
   enable_api_gateway = true
 
