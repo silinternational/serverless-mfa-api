@@ -7,9 +7,11 @@ variable "aws_region_secondary" {
 }
 
 variable "aws_access_key_id" {
+  default = null
 }
 
 variable "aws_secret_access_key" {
+  default = null
 }
 
 /*
