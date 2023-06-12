@@ -1,4 +1,9 @@
 
+locals {
+  /* The app_env is used in some resource names. */
+  app_env = var.app_environment == "production" ? "prod" : "dev"
+}
+
 /*
  * Create IAM user for Serverless framework to use to deploy the lambda function
  */
@@ -77,7 +82,7 @@ module "serverless-user" {
  */
 
 resource "aws_dynamodb_table" "api_keys" {
-  name             = "mfa-api_${var.app_env}_api-key_global"
+  name             = "mfa-api_${local.app_env}_api-key_global"
   hash_key         = "value"
   billing_mode     = "PAY_PER_REQUEST"
   stream_enabled   = true
@@ -98,7 +103,7 @@ resource "aws_dynamodb_table" "api_keys" {
 }
 
 resource "aws_dynamodb_table" "totp" {
-  name             = "mfa-api_${var.app_env}_totp_global"
+  name             = "mfa-api_${local.app_env}_totp_global"
   hash_key         = "uuid"
   billing_mode     = "PAY_PER_REQUEST"
   stream_enabled   = true
@@ -119,7 +124,7 @@ resource "aws_dynamodb_table" "totp" {
 }
 
 resource "aws_dynamodb_table" "u2f" {
-  name             = "mfa-api_${var.app_env}_u2f_global"
+  name             = "mfa-api_${local.app_env}_u2f_global"
   hash_key         = "uuid"
   billing_mode     = "PAY_PER_REQUEST"
   stream_enabled   = true

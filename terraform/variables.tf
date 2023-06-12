@@ -24,12 +24,6 @@ variable "app_customer" {
   default     = "shared"
 }
 
-variable "app_env" {
-  description = "Short environment name (e.g. 'dev' or 'prod'), used in some resource names"
-  type        = string
-  default     = "prod"
-}
-
 variable "app_environment" {
   description = "environment name to use for the itse_app_environment tag, e.g. staging, production"
   type        = string
