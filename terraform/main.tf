@@ -3,12 +3,14 @@
  * Create IAM user for Serverless framework to use to deploy the lambda function
  */
 module "serverless-user" {
+  count   = var.app_environment == "staging" ? 1 : 0
   source  = "silinternational/serverless-user/aws"
   version = "0.1.3"
 
   app_name           = "mfa-api"
   aws_region         = var.aws_region
   enable_api_gateway = true
+
   extra_policies = [
     jsonencode(
       {
