@@ -10,10 +10,11 @@ locals {
 module "serverless-user" {
   count   = var.app_environment == "staging" ? 1 : 0
   source  = "silinternational/serverless-user/aws"
-  version = "0.1.3"
+  version = "0.3.2"
 
   app_name           = "mfa-api"
   aws_region         = var.aws_region
+  aws_region_policy  = "*"
   enable_api_gateway = true
 
   extra_policies = [
