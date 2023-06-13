@@ -10,4 +10,4 @@ set -x
 serverless --version
 
 echo "Deploying stage $1..."
-serverless deploy --verbose --stage "$1"
+serverless deploy --verbose --stage "$1" --region us-east-1
