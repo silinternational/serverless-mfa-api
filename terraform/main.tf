@@ -82,7 +82,7 @@ module "serverless-user" {
  * Manage custom domain name resources.
  */
 module "custom-domains" {
-  source = "aws/custom-domains"
+  source = "./aws/custom-domains"
 
   api_name              = "${local.app_env}-mfa-api"
   api_stage             = local.app_env
