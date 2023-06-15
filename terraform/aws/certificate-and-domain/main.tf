@@ -4,7 +4,8 @@ locals {
 }
 
 module "certificate" {
-  source = "../acm-certificate"
+  source  = "silinternational/acm-certificate/aws"
+  version = "0.1.0"
 
   certificate_domain_name = local.full_domain_name
   cloudflare_zone_name    = var.cloudflare_zone_name
