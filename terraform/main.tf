@@ -99,6 +99,24 @@ module "certificate-secondary-region" {
 
   providers = { aws = "aws.secondary" }
 }
+module "custom-domain-primary-region" {
+  source     = "aws/api-gateway-custom-domain"
+  depends_on = [module.certificate-primary-region]
+
+  api_name        = "${local.app_env}-mfa-api"
+  api_stage       = local.app_env
+  certificate_arn = module.certificate-primary-region.certificate_arn
+  domain_name     = module.certificate-primary-region.domain_name
+}
+module "custom-domain-secondary-region" {
+  source     = "aws/api-gateway-custom-domain"
+  depends_on = [module.certificate-secondary-region]
+
+  api_name        = "${local.app_env}-mfa-api"
+  api_stage       = local.app_env
+  certificate_arn = module.certificate-secondary-region.certificate_arn
+  domain_name     = module.certificate-secondary-region.domain_name
+}
 
 
 /*
