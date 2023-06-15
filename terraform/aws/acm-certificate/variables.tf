@@ -1,7 +1,7 @@
+
 variable "create_dns_validation" {
   description = "Whether to create the DNS record for certificate validation"
   type        = bool
-  default     = true
 }
 
 variable "certificate_domain_name" {
