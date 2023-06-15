@@ -79,6 +79,28 @@ module "serverless-user" {
 
 
 /*
+ * Manage custom domain name resources.
+ */
+module "certificate-primary-region" {
+  source = "aws-acm-certificate"
+
+  certificate_domain_name = "mfa-api.${var.cloudflare_zone_name}"
+  cloudflare_zone_name    = var.cloudflare_zone_name
+
+  providers = { aws = "aws" }
+}
+module "certificate-secondary-region" {
+  source = "aws-acm-certificate"
+
+  certificate_domain_name = "mfa-api.${var.cloudflare_zone_name}"
+  cloudflare_zone_name    = var.cloudflare_zone_name
+  create_dns_validation   = false # Because we already did, and it will match.
+
+  providers = { aws = "aws.secondary" }
+}
+
+
+/*
  * Manage DynamoDB tables used by the functions.
  */
 
