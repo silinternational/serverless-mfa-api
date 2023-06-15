@@ -81,47 +81,14 @@ module "serverless-user" {
 /*
  * Manage custom domain name resources.
  */
-module "certificate-primary-region" {
-  source = "aws/acm-certificate"
+module "custom-domains" {
+  source = "aws/custom-domains"
 
-  certificate_domain_name = "mfa-api.${var.cloudflare_zone_name}"
-  cloudflare_zone_name    = var.cloudflare_zone_name
-
-  providers = { aws = "aws" }
+  api_name              = "${local.app_env}-mfa-api"
+  api_stage             = local.app_env
+  certificate_subdomain = "mfa-api"
+  cloudflare_zone_name  = var.cloudflare_zone_name
 }
-module "certificate-secondary-region" {
-  source     = "aws/acm-certificate"
-  depends_on = [module.certificate-primary-region]
-
-  certificate_domain_name = "mfa-api.${var.cloudflare_zone_name}"
-  cloudflare_zone_name    = var.cloudflare_zone_name
-  create_dns_validation   = false # Because we already did, and it will match.
-
-  providers = { aws = "aws.secondary" }
-}
-module "custom-domain-primary-region" {
-  source     = "aws/api-gateway-custom-domain"
-  depends_on = [module.certificate-primary-region]
-
-  api_name        = "${local.app_env}-mfa-api"
-  api_stage       = local.app_env
-  certificate_arn = module.certificate-primary-region.certificate_arn
-  domain_name     = module.certificate-primary-region.domain_name
-
-  providers = { aws = "aws" }
-}
-module "custom-domain-secondary-region" {
-  source     = "aws/api-gateway-custom-domain"
-  depends_on = [module.certificate-secondary-region]
-
-  api_name        = "${local.app_env}-mfa-api"
-  api_stage       = local.app_env
-  certificate_arn = module.certificate-secondary-region.certificate_arn
-  domain_name     = module.certificate-secondary-region.domain_name
-
-  providers = { aws = "aws.secondary" }
-}
-
 
 /*
  * Manage DynamoDB tables used by the functions.
