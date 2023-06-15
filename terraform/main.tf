@@ -82,7 +82,7 @@ module "serverless-user" {
  * Manage custom domain name resources.
  */
 module "certificate-primary-region" {
-  source = "aws-acm-certificate"
+  source = "aws/acm-certificate"
 
   certificate_domain_name = "mfa-api.${var.cloudflare_zone_name}"
   cloudflare_zone_name    = var.cloudflare_zone_name
@@ -90,7 +90,7 @@ module "certificate-primary-region" {
   providers = { aws = "aws" }
 }
 module "certificate-secondary-region" {
-  source     = "aws-acm-certificate"
+  source     = "aws/acm-certificate"
   depends_on = [module.certificate-primary-region]
 
   certificate_domain_name = "mfa-api.${var.cloudflare_zone_name}"
