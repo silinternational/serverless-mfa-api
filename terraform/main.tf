@@ -107,6 +107,8 @@ module "custom-domain-primary-region" {
   api_stage       = local.app_env
   certificate_arn = module.certificate-primary-region.certificate_arn
   domain_name     = module.certificate-primary-region.domain_name
+
+  providers = { aws = "aws" }
 }
 module "custom-domain-secondary-region" {
   source     = "aws/api-gateway-custom-domain"
@@ -116,6 +118,8 @@ module "custom-domain-secondary-region" {
   api_stage       = local.app_env
   certificate_arn = module.certificate-secondary-region.certificate_arn
   domain_name     = module.certificate-secondary-region.domain_name
+
+  providers = { aws = "aws.secondary" }
 }
 
 
