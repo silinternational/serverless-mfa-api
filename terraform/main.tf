@@ -84,8 +84,8 @@ module "serverless-user" {
 module "custom-domains" {
   source = "./modules/custom-domains"
 
-  api_name              = "${local.app_env}-mfa-api"
-  certificate_subdomain = "mfa-api"
+  api_name              = "${local.app_env}-${var.app_name}"
+  certificate_subdomain = var.app_name
   cloudflare_zone_name  = var.cloudflare_zone_name
 
   providers = {
