@@ -1,20 +1,16 @@
 
-data "aws_apigatewayv2_apis" "this" {
+# NOTE: For REST APIs, use `aws_api_gateway_*` resources, not
+# `aws_apigatewayv2_*` resources.
+data "aws_api_gateway_rest_api" "this" {
   name = var.api_name
 }
 
-resource "aws_apigatewayv2_domain_name" "this" {
-  domain_name = var.domain_name
+resource "aws_api_gateway_domain_name" "this" {
+  domain_name              = var.domain_name
+  regional_certificate_arn = var.certificate_arn
+  security_policy          = "TLS_1_2"
 
-  domain_name_configuration {
-    certificate_arn = var.certificate_arn
-    endpoint_type   = "REGIONAL"
-    security_policy = "TLS_1_2"
+  endpoint_configuration {
+    types = ["REGIONAL"]
   }
-}
-
-resource "aws_apigatewayv2_api_mapping" "this" {
-  api_id      = one(data.aws_apigatewayv2_apis.this.ids)
-  domain_name = var.domain_name
-  stage       = var.api_stage
 }
