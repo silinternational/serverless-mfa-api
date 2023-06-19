@@ -94,6 +94,16 @@ module "custom-domains" {
   }
 }
 
+module "fail-over-cname" {
+  source                       = "./modules/fail-over-cname"
+  aws_region                   = var.aws_region
+  aws_region_secondary         = var.aws_region_secondary
+  cloudflare_zone_name         = var.cloudflare_zone_name
+  primary_region_domain_name   = module.custom-domains.primary_region_domain_name
+  secondary_region_domain_name = module.custom-domains.secondary_region_domain_name
+  subdomain                    = var.app_name
+}
+
 /*
  * Manage DynamoDB tables used by the functions.
  */
