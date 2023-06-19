@@ -84,7 +84,9 @@ module "serverless-user" {
 module "custom-domains" {
   source = "./modules/custom-domains"
 
-  api_name              = "${local.app_env}-${var.app_name}"
+  # NOTE: This value needs to match the name given to the API by Serverless.
+  api_name = "${local.app_env}-${var.app_name}"
+
   certificate_subdomain = var.app_name
   cloudflare_zone_name  = var.cloudflare_zone_name
 
