@@ -31,7 +31,7 @@ variable "app_environment" {
 }
 
 variable "app_name" {
-  description = "app name to use for the itse_app_name tag"
+  description = "WARNING: Changing this will replace (delete) resources, even your database. Used in naming and tagging resources."
   type        = string
-  default     = "idp"
+  default     = "mfa-api"
 }
