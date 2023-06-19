@@ -14,7 +14,7 @@ resource "aws_apigatewayv2_domain_name" "this" {
 }
 
 resource "aws_apigatewayv2_api_mapping" "this" {
-  api_id      = data.aws_apigatewayv2_apis.this.ids[0]
+  api_id      = one(data.aws_apigatewayv2_apis.this.ids)
   domain_name = var.domain_name
   stage       = var.api_stage
 }
