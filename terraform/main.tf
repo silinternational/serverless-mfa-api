@@ -12,7 +12,7 @@ module "serverless-user" {
   source  = "silinternational/serverless-user/aws"
   version = "0.3.2"
 
-  app_name           = "mfa-api"
+  app_name           = var.app_name
   aws_region         = var.aws_region
   aws_region_policy  = "*"
   enable_api_gateway = true
@@ -28,7 +28,7 @@ module "serverless-user" {
               "dynamodb:DescribeGlobalTableSettings",
               "dynamodb:DescribeGlobalTable"
             ],
-            "Resource" : "arn:aws:dynamodb:*:*:global-table/mfa-api_*"
+            "Resource" : "arn:aws:dynamodb:*:*:global-table/${var.app_name}_*"
           },
           {
             "Effect" : "Allow",
@@ -52,7 +52,7 @@ module "serverless-user" {
               "dynamodb:UpdateItem",
               "dynamodb:UpdateTable"
             ],
-            "Resource" : "arn:aws:dynamodb:*:*:table/mfa-api_*"
+            "Resource" : "arn:aws:dynamodb:*:*:table/${var.app_name}_*"
           },
           {
             "Effect" : "Allow",
@@ -60,7 +60,7 @@ module "serverless-user" {
               "dynamodb:Scan",
               "dynamodb:Query"
             ],
-            "Resource" : "arn:aws:dynamodb:*:*:table/mfa-api_*/index/*"
+            "Resource" : "arn:aws:dynamodb:*:*:table/${var.app_name}_*/index/*"
           },
           {
             "Effect" : "Allow",
@@ -83,7 +83,7 @@ module "serverless-user" {
  */
 
 resource "aws_dynamodb_table" "api_keys" {
-  name             = "mfa-api_${local.app_env}_api-key_global"
+  name             = "${var.app_name}_${local.app_env}_api-key_global"
   hash_key         = "value"
   billing_mode     = "PAY_PER_REQUEST"
   stream_enabled   = true
@@ -104,7 +104,7 @@ resource "aws_dynamodb_table" "api_keys" {
 }
 
 resource "aws_dynamodb_table" "totp" {
-  name             = "mfa-api_${local.app_env}_totp_global"
+  name             = "${var.app_name}_${local.app_env}_totp_global"
   hash_key         = "uuid"
   billing_mode     = "PAY_PER_REQUEST"
   stream_enabled   = true
@@ -125,7 +125,7 @@ resource "aws_dynamodb_table" "totp" {
 }
 
 resource "aws_dynamodb_table" "u2f" {
-  name             = "mfa-api_${local.app_env}_u2f_global"
+  name             = "${var.app_name}_${local.app_env}_u2f_global"
   hash_key         = "uuid"
   billing_mode     = "PAY_PER_REQUEST"
   stream_enabled   = true
