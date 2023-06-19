@@ -3,11 +3,6 @@ variable "api_name" {
   type        = string
 }
 
-variable "api_stage" {
-  description = "The API stage ('dev' or 'prod'). Used in mapping the custom domain name in API Gateway."
-  type        = string
-}
-
 variable "certificate_arn" {
   description = "The ARN for the Amazon certificate to use for this domain name"
   type        = string

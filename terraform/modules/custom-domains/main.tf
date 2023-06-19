@@ -3,7 +3,6 @@ module "primary-region" {
   source = "../certificate-and-domain"
 
   api_name              = var.api_name
-  api_stage             = var.api_stage
   certificate_subdomain = var.certificate_subdomain
   cloudflare_zone_name  = var.cloudflare_zone_name
 
@@ -15,7 +14,6 @@ module "secondary-region" {
   depends_on = [module.primary-region]
 
   api_name              = var.api_name
-  api_stage             = var.api_stage
   certificate_subdomain = var.certificate_subdomain
   cloudflare_zone_name  = var.cloudflare_zone_name
 

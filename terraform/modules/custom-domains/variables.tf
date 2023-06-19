@@ -3,11 +3,6 @@ variable "api_name" {
   type        = string
 }
 
-variable "api_stage" {
-  description = "The API stage ('dev' or 'prod'). Used in mapping the custom domain name in API Gateway."
-  type        = string
-}
-
 variable "certificate_subdomain" {
   description = "The subdomain for the API Gateway custom domain. Will be combined with the Cloudflare zone (aka domain)."
   type        = string

@@ -85,7 +85,6 @@ module "custom-domains" {
   source = "./modules/custom-domains"
 
   api_name              = "${local.app_env}-mfa-api"
-  api_stage             = local.app_env
   certificate_subdomain = "mfa-api"
   cloudflare_zone_name  = var.cloudflare_zone_name
 

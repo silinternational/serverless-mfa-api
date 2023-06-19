@@ -15,7 +15,6 @@ module "domain" {
   source = "../../aws/api-gateway-custom-domain"
 
   api_name        = var.api_name
-  api_stage       = var.api_stage
   certificate_arn = module.certificate.certificate_arn
   domain_name     = local.full_domain_name
 }
