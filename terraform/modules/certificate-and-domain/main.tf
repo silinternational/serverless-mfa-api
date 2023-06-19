@@ -12,7 +12,7 @@ module "certificate" {
 }
 
 module "domain" {
-  source = "../api-gateway-custom-domain"
+  source = "../../aws/api-gateway-custom-domain"
 
   api_name        = var.api_name
   api_stage       = var.api_stage
