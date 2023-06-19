@@ -88,6 +88,11 @@ module "custom-domains" {
   api_stage             = local.app_env
   certificate_subdomain = "mfa-api"
   cloudflare_zone_name  = var.cloudflare_zone_name
+
+  providers = {
+    aws           = aws
+    aws.secondary = aws.secondary
+  }
 }
 
 /*

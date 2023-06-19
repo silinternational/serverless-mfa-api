@@ -7,7 +7,7 @@ module "primary-region" {
   certificate_subdomain = var.certificate_subdomain
   cloudflare_zone_name  = var.cloudflare_zone_name
 
-  providers = { aws = "aws" }
+  providers = { aws = aws }
 }
 
 module "secondary-region" {
@@ -22,5 +22,5 @@ module "secondary-region" {
   # Don't create another DNS record, since it's the same for both regions.
   create_dns_validation = false
 
-  providers = { aws = "aws.secondary" }
+  providers = { aws = aws.secondary }
 }
