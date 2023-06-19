@@ -77,7 +77,6 @@ module "serverless-user" {
   ]
 }
 
-
 /*
  * Manage custom domain name resources.
  */
@@ -95,7 +94,6 @@ module "custom-domains" {
     aws.secondary = aws.secondary
   }
 }
-
 module "fail-over-cname" {
   source                       = "./modules/fail-over-cname"
   aws_region                   = var.aws_region
@@ -109,7 +107,6 @@ module "fail-over-cname" {
 /*
  * Manage DynamoDB tables used by the functions.
  */
-
 resource "aws_dynamodb_table" "api_keys" {
   name             = "${var.app_name}_${local.app_env}_api-key_global"
   hash_key         = "value"
@@ -130,7 +127,6 @@ resource "aws_dynamodb_table" "api_keys" {
     ignore_changes = [replica]
   }
 }
-
 resource "aws_dynamodb_table" "totp" {
   name             = "${var.app_name}_${local.app_env}_totp_global"
   hash_key         = "uuid"
@@ -151,7 +147,6 @@ resource "aws_dynamodb_table" "totp" {
     ignore_changes = [replica]
   }
 }
-
 resource "aws_dynamodb_table" "u2f" {
   name             = "${var.app_name}_${local.app_env}_u2f_global"
   hash_key         = "uuid"
