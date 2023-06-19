@@ -1,6 +1,6 @@
 
 module "primary-region" {
-  source = "../certificate-and-domain"
+  source = "../../aws/certificate-and-domain"
 
   api_name              = var.api_name
   api_stage             = var.api_stage
@@ -11,7 +11,7 @@ module "primary-region" {
 }
 
 module "secondary-region" {
-  source     = "../certificate-and-domain"
+  source     = "../../aws/certificate-and-domain"
   depends_on = [module.primary-region]
 
   api_name              = var.api_name
