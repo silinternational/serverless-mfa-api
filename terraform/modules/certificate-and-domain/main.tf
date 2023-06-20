@@ -12,7 +12,7 @@ module "certificate" {
 }
 
 module "domain" {
-  source = "../../aws/api-gateway-custom-domain"
+  source = "github.com/silinternational/terraform-aws-api-gateway-custom-domain?ref=0.1.0"
 
   api_name        = var.api_name
   certificate_arn = module.certificate.certificate_arn
