@@ -15,7 +15,8 @@ module "custom-domains" {
 }
 
 module "fail-over-cname" {
-  source                       = "../fail-over-cname"
+  source = "../fail-over-cname"
+
   aws_region                   = var.aws_region
   aws_region_secondary         = var.aws_region_secondary
   cloudflare_zone_name         = var.cloudflare_zone_name
