@@ -5,7 +5,7 @@ variable "aws_region" {
 }
 
 variable "aws_region_secondary" {
-  description = "The primary AWS region (e.g. us-west-2)"
+  description = "The secondary AWS region (e.g. us-west-2)"
   type        = string
 }
 
