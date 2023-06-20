@@ -80,28 +80,19 @@ module "serverless-user" {
 /*
  * Manage custom domain name resources.
  */
-module "custom-domains" {
-  source = "./modules/custom-domains"
+module "dns-for-failover" {
+  source = "./modules/serverless-api-dns-for-failover"
 
-  # NOTE: This value needs to match the name given to the API by Serverless.
-  api_name = "${local.app_env}-${var.app_name}"
-
-  certificate_subdomain = var.app_name
-  cloudflare_zone_name  = var.cloudflare_zone_name
+  app_name             = var.app_name
+  aws_region           = var.aws_region
+  aws_region_secondary = var.aws_region_secondary
+  cloudflare_zone_name = var.cloudflare_zone_name
+  serverless_stage     = local.app_env
 
   providers = {
     aws           = aws
     aws.secondary = aws.secondary
   }
-}
-module "fail-over-cname" {
-  source                       = "./modules/fail-over-cname"
-  aws_region                   = var.aws_region
-  aws_region_secondary         = var.aws_region_secondary
-  cloudflare_zone_name         = var.cloudflare_zone_name
-  primary_region_domain_name   = module.custom-domains.primary_region_domain_name
-  secondary_region_domain_name = module.custom-domains.secondary_region_domain_name
-  subdomain                    = var.app_name
 }
 
 /*
