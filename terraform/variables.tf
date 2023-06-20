@@ -20,7 +20,7 @@ variable "cloudflare_token" {
 }
 
 variable "cloudflare_zone_name" {
-  description = "Cloudflare zone (domain) for certificate validation DNS record."
+  description = "Cloudflare zone (domain) for DNS records"
   type        = string
 }
 
