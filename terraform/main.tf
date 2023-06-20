@@ -78,7 +78,7 @@ module "serverless-user" {
 }
 
 /*
- * Manage custom domain name resources.
+ * Manage custom domain name resources (used primarily to ease failovers).
  */
 module "dns-for-failover" {
   source = "./modules/serverless-api-dns-for-failover"
