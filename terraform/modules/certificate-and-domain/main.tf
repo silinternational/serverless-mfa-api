@@ -4,7 +4,7 @@ locals {
 }
 
 module "certificate" {
-  source = "github.com/silinternational/terraform-aws-acm-certificate?ref=feature%2Fadd-validation-id-output"
+  source = "github.com/silinternational/terraform-aws-acm-certificate?ref=0.2.0"
 
   certificate_domain_name = local.full_domain_name
   cloudflare_zone_name    = var.cloudflare_zone_name
