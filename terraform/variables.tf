@@ -14,6 +14,16 @@ variable "aws_secret_access_key" {
   default = null
 }
 
+variable "cloudflare_token" {
+  description = "The Cloudflare limited access API token"
+  type        = string
+}
+
+variable "cloudflare_zone_name" {
+  description = "Cloudflare zone (domain) for DNS records"
+  type        = string
+}
+
 /*
  * AWS tag values
  */

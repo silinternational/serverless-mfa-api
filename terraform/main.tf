@@ -77,11 +77,25 @@ module "serverless-user" {
   ]
 }
 
+/*
+ * Manage custom domain name resources (used primarily to ease failovers).
+ */
+module "dns-for-failover" {
+  source = "./modules/serverless-api-dns-for-failover"
+
+  app_name             = var.app_name
+  cloudflare_zone_name = var.cloudflare_zone_name
+  serverless_stage     = local.app_env
+
+  providers = {
+    aws           = aws
+    aws.secondary = aws.secondary
+  }
+}
 
 /*
  * Manage DynamoDB tables used by the functions.
  */
-
 resource "aws_dynamodb_table" "api_keys" {
   name             = "${var.app_name}_${local.app_env}_api-key_global"
   hash_key         = "value"
@@ -102,7 +116,6 @@ resource "aws_dynamodb_table" "api_keys" {
     ignore_changes = [replica]
   }
 }
-
 resource "aws_dynamodb_table" "totp" {
   name             = "${var.app_name}_${local.app_env}_totp_global"
   hash_key         = "uuid"
@@ -123,7 +136,6 @@ resource "aws_dynamodb_table" "totp" {
     ignore_changes = [replica]
   }
 }
-
 resource "aws_dynamodb_table" "u2f" {
   name             = "${var.app_name}_${local.app_env}_u2f_global"
   hash_key         = "uuid"
