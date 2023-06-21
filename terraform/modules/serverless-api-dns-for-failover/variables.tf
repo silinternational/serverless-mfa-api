@@ -4,16 +4,6 @@ variable "app_name" {
   type        = string
 }
 
-variable "aws_region" {
-  description = "The primary AWS region (e.g. us-east-2)"
-  type        = string
-}
-
-variable "aws_region_secondary" {
-  description = "The secondary AWS region (e.g. us-west-2)"
-  type        = string
-}
-
 variable "cloudflare_zone_name" {
   description = "The Cloudflare zone (aka domain) name"
   type        = string
