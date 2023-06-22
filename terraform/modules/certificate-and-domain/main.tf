@@ -12,7 +12,7 @@ module "certificate" {
 }
 
 module "domain" {
-  source     = "github.com/silinternational/terraform-aws-api-gateway-custom-domain?ref=feature%2Fadd-api-mapping"
+  source     = "github.com/silinternational/terraform-aws-api-gateway-custom-domain?ref=0.2.0"
   depends_on = [module.certificate.validation_id]
 
   api_name        = var.api_name
