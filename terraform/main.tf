@@ -81,10 +81,9 @@ module "serverless-user" {
  * Manage custom domain name resources (used primarily to ease failovers).
  */
 module "dns-for-failover" {
-  source = "./modules/serverless-api-dns-for-failover"
+  source = "github.com/silinternational/terraform-aws-serverless-api-dns-for-failover?ref=0.1.0"
 
   app_name             = var.app_name
-  api_stage            = local.app_env
   cloudflare_zone_name = var.cloudflare_zone_name
   serverless_stage     = local.app_env
 
