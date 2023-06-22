@@ -16,6 +16,7 @@ module "custom-domains" {
   # NOTE: This value needs to match the name given to the API by Serverless.
   api_name = "${var.serverless_stage}-${var.app_name}"
 
+  api_stage             = var.api_stage
   certificate_subdomain = var.app_name
   cloudflare_zone_name  = var.cloudflare_zone_name
 
