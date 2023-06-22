@@ -84,6 +84,7 @@ module "dns-for-failover" {
   source = "./modules/serverless-api-dns-for-failover"
 
   app_name             = var.app_name
+  api_stage            = local.app_env
   cloudflare_zone_name = var.cloudflare_zone_name
   serverless_stage     = local.app_env
 

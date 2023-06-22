@@ -4,6 +4,11 @@ variable "app_name" {
   type        = string
 }
 
+variable "api_stage" {
+  description = "The stage of the API (e.g. 'dev' or 'prod')"
+  type        = string
+}
+
 variable "cloudflare_zone_name" {
   description = "The Cloudflare zone (aka domain) name"
   type        = string

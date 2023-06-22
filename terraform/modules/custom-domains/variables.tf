@@ -3,6 +3,11 @@ variable "api_name" {
   type        = string
 }
 
+variable "api_stage" {
+  description = "The stage of the API (e.g. 'dev' or 'prod')"
+  type        = string
+}
+
 variable "certificate_subdomain" {
   description = "The subdomain for the API Gateway custom domain. Will be combined with the Cloudflare zone (aka domain)."
   type        = string

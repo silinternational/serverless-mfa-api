@@ -18,4 +18,5 @@ module "domain" {
   api_name        = var.api_name
   certificate_arn = module.certificate.certificate_arn
   domain_name     = local.full_domain_name
+  stage           = var.api_stage
 }
