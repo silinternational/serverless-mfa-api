@@ -7,7 +7,7 @@ locals {
 /*
  * Create IAM user for Serverless framework to use to deploy the lambda function
  */
-module "serverless-user" {
+module "serverless_user" {
   count   = var.app_environment == "staging" ? 1 : 0
   source  = "silinternational/serverless-user/aws"
   version = "0.3.2"
