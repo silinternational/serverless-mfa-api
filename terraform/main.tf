@@ -7,7 +7,7 @@ locals {
 /*
  * Create IAM user for Serverless framework to use to deploy the lambda function
  */
-module "serverless-user" {
+module "serverless_user" {
   count   = var.app_environment == "staging" ? 1 : 0
   source  = "silinternational/serverless-user/aws"
   version = "0.3.2"
@@ -80,8 +80,8 @@ module "serverless-user" {
 /*
  * Manage custom domain name resources (used primarily to ease failovers).
  */
-module "dns-for-failover" {
-  source = "github.com/silinternational/terraform-aws-serverless-api-dns-for-failover?ref=0.1.0"
+module "dns_for_failover" {
+  source = "github.com/silinternational/terraform-aws-serverless-api-dns-for-failover?ref=0.2.0"
 
   app_name             = var.app_name
   cloudflare_zone_name = var.cloudflare_zone_name
