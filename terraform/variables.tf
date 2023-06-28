@@ -19,7 +19,7 @@ variable "cloudflare_token" {
   type        = string
 }
 
-variable "cloudflare_zone_name" {
+variable "cloudflare_domain" {
   description = "Cloudflare zone (domain) for DNS records"
   type        = string
 }
