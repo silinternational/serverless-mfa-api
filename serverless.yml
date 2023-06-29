@@ -34,7 +34,7 @@ custom:
   namespace: ${self:service}_${sls:stage}
   apiKeyTable: ${self:custom.namespace}_api-key_global
   totpTable: ${self:custom.namespace}_totp_global
-  u2fTable: ${self:custom.namespace}_u2f
+  u2fTable: ${self:custom.namespace}_u2f_global
   dev_env: staging
   prod_env: production
   secondaryRegion: ${env:AWS_REGION_SECONDARY, "us-west-2"}
