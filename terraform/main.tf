@@ -85,7 +85,7 @@ module "dns_for_failover" {
   version = "0.3.0"
 
   api_name             = "${local.app_env}-${var.app_name}"
-  cloudflare_zone_name = var.cloudflare_zone_name
+  cloudflare_zone_name = var.cloudflare_domain
   serverless_stage     = local.app_env
   subdomain            = var.app_name
 
