@@ -33,7 +33,7 @@ provider:
 custom:
   namespace: ${self:service}_${sls:stage}
   apiKeyTable: ${self:custom.namespace}_api-key_global
-  totpTable: ${self:custom.namespace}_totp
+  totpTable: ${self:custom.namespace}_totp_global
   u2fTable: ${self:custom.namespace}_u2f
   dev_env: staging
   prod_env: production
