@@ -82,7 +82,7 @@ module "serverless_user" {
  */
 module "dns_for_failover" {
   source  = "silinternational/serverless-api-dns-for-failover/aws"
-  version = "0.4.0"
+  version = "0.5.0"
 
   api_name             = "${local.app_env}-${var.app_name}"
   cloudflare_zone_name = var.cloudflare_domain
