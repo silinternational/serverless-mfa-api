@@ -110,6 +110,10 @@ resource "aws_dynamodb_table" "api_keys" {
     type = "S"
   }
 
+  point_in_time_recovery {
+    enabled = true
+  }
+
   replica {
     region_name = var.aws_region_secondary
   }
@@ -130,6 +134,10 @@ resource "aws_dynamodb_table" "totp" {
     type = "S"
   }
 
+  point_in_time_recovery {
+    enabled = true
+  }
+
   replica {
     region_name = var.aws_region_secondary
   }
@@ -148,6 +156,10 @@ resource "aws_dynamodb_table" "u2f" {
   attribute {
     name = "uuid"
     type = "S"
+  }
+
+  point_in_time_recovery {
+    enabled = true
   }
 
   replica {
