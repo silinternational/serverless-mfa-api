@@ -8,8 +8,8 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 jobs:
-  setup:
-    name: Setup
+  test_and_deploy:
+    name: Test and Deploy
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -17,35 +17,13 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18.x'
-    - name: Setup
+    - name: Test
       run: |  
         npm install --no-fund -g serverless@3.25
         npm ci --no-fund
-
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18.x'
-    - run: npm test
-    - run: serverless --version
-    - run: serverless info --conceal
-
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18.x'
+        npm test
+        serverless --version
+        serverless info --conceal
     - if: github.ref_name == 'develop'
       run: serverless deploy --verbose --stage dev --region us-east-1
     - if: github.ref_name == 'develop'
