@@ -4,7 +4,7 @@ A Serverless API for registering and validating Multi-Factor Authentication meth
 Currently supports Time-based One Time Passwords (TOTP) and FIDO U2F devices (YubiKeys).
 
 For details about the various API endpoints, see
-[the RAML file](https://github.com/silinternational/serverless-mfa-api/blob/master/api.raml).
+[the RAML file](https://github.com/silinternational/serverless-mfa-api/blob/main/api.raml).
 
 ## Basic Workflow
 
@@ -72,21 +72,6 @@ For details about the various API endpoints, see
 - The `appId` used in the registration process must match the URL of the page where the user is authenticating and it
   must be HTTPS. It does  not need the full path though, so https://myapp.com is sufficient if the page is at
   https://myapp.com/auth/login.
-
-## Continuous Integration / Continuous Deployment (CI/CD)
-
-To set this up on Codeship, do the following:
-
-- Create a Codeship Basic project.
-- Give it a Setup Command of `./codeship/setup.sh`
-- Give it a Test Command of `./codeship/test.sh`
-- Create a Deployment Pipeline for the `develop` branch with this command:
-  `./codeship/deploy-dev.sh`
-- Create a Deployment Pipeline for the `master` branch with this command:
-  `./codeship/deploy-prod.sh`
-- Provide `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables
-  with the credentials of the AWS IAM user that Serverless (running on Codeship)
-  should act as when deploying this API.
 
 ## Automated Backups ##
 While DynamoDB supports On Demand backups as well as Continuous Backups with
@@ -328,7 +313,7 @@ terraform taint module.serverless-user.aws_iam_access_key.serverless
 ```
 2. Run a new plan on Terraform Cloud
 3. Review the new plan and apply if it is correct
-4. Copy the new key and secret from the Terraform output into Codeship
+4. Copy the new key and secret from the Terraform output into GitHub Repository Secrets
 
 ## Glossary
 
