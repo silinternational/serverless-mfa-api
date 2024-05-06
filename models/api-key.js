@@ -182,6 +182,8 @@ const isValidApiSecret = (apiKeyRecord, apiSecret = '') => {
   const isValid = password.compare(apiSecret, apiKeyRecord.hashedApiSecret);
   if (isValid !== true) {
     console.log('The given API Secret is NOT valid for the given API Key record.');
+    const redactedApiSecret = apiSecret.substring(0, 3) + '...[snip]...' + apiSecret.substring(apiSecret.length - 3);
+    console.log(redactedApiSecret);
     return false;
   }
   
