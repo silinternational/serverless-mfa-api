@@ -10,10 +10,9 @@ locals {
 module "serverless_user" {
   count   = var.app_environment == "staging" ? 1 : 0
   source  = "silinternational/serverless-user/aws"
-  version = "0.3.2"
+  version = "0.4.2"
 
   app_name           = var.app_name
-  aws_region         = var.aws_region
   aws_region_policy  = "*"
   enable_api_gateway = true
 
