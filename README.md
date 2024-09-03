@@ -300,7 +300,7 @@ To run this locally (such as for development)...
 To start a local container for development of Serverless configuration:
 
 ```
-docker-compose run --rm dev bash
+docker compose run --rm dev bash
 ```
 
 ## Credential Rotation

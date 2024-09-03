@@ -175,50 +175,50 @@ resources:
     ApiKeyActivateLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
-        RetentionInDays: "30"
+        RetentionInDays: "60"
         Tags: ${self:custom.resourceTags}
     ApiKeyCreateLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
-        RetentionInDays: "30"
+        RetentionInDays: "60"
         Tags: ${self:custom.resourceTags}
     TotpCreateLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
-        RetentionInDays: "30"
+        RetentionInDays: "60"
         Tags: ${self:custom.resourceTags}
     TotpDeleteLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
-        RetentionInDays: "30"
+        RetentionInDays: "60"
         Tags: ${self:custom.resourceTags}
     TotpValidateLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
-        RetentionInDays: "30"
+        RetentionInDays: "60"
         Tags: ${self:custom.resourceTags}
     U2fCreateAuthenticationLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
-        RetentionInDays: "30"
+        RetentionInDays: "60"
         Tags: ${self:custom.resourceTags}
     U2fCreateRegistrationLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
-        RetentionInDays: "30"
+        RetentionInDays: "60"
         Tags: ${self:custom.resourceTags}
     U2fDeleteLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
-        RetentionInDays: "30"
+        RetentionInDays: "60"
         Tags: ${self:custom.resourceTags}
     U2fValidateAuthenticationLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
-        RetentionInDays: "30"
+        RetentionInDays: "60"
         Tags: ${self:custom.resourceTags}
     U2fValidateRegistrationLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
-        RetentionInDays: "30"
+        RetentionInDays: "60"
         Tags: ${self:custom.resourceTags}
