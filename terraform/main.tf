@@ -10,7 +10,7 @@ locals {
 module "serverless_user" {
   count   = var.app_environment == "staging" ? 1 : 0
   source  = "silinternational/serverless-user/aws"
-  version = "0.4.2"
+  version = "~> 0.4.2"
 
   app_name           = var.app_name
   aws_region_policy  = "*"
@@ -81,7 +81,7 @@ module "serverless_user" {
  */
 module "dns_for_failover" {
   source  = "silinternational/serverless-api-dns-for-failover/aws"
-  version = "~> 0.5.1"
+  version = "~> 0.6.0"
 
   api_name             = "${local.app_env}-${var.app_name}"
   cloudflare_zone_name = var.cloudflare_domain
