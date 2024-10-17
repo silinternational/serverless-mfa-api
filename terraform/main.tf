@@ -122,6 +122,7 @@ resource "aws_dynamodb_table" "api_keys" {
     ignore_changes = [replica]
   }
 }
+
 resource "aws_dynamodb_table" "totp" {
   name                        = "${var.app_name}_${local.app_env}_totp_global"
   hash_key                    = "uuid"
@@ -147,6 +148,7 @@ resource "aws_dynamodb_table" "totp" {
     ignore_changes = [replica]
   }
 }
+
 resource "aws_dynamodb_table" "u2f" {
   name                        = "${var.app_name}_${local.app_env}_u2f_global"
   hash_key                    = "uuid"
