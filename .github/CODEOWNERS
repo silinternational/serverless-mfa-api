@@ -1,0 +1,3 @@
+* @silinternational/developers
+*.tf @silinternational/tf-devs
+*.js @silinternational/js-devs
