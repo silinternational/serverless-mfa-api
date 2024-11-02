@@ -40,6 +40,8 @@ jobs:
         node-version: '18.x'
     - name: install-serverless
       run: npm install --no-fund -g serverless@3.25
+    - name: npm ci
+      run: npm ci --no-fund
     - if: github.ref_name == 'develop'
       run: serverless deploy --verbose --stage dev --region us-east-1
     - if: github.ref_name == 'main'
@@ -57,6 +59,8 @@ jobs:
         node-version: '18.x'
     - name: install-serverless
       run: npm install --no-fund -g serverless@3.25
+    - name: npm ci
+      run: npm ci --no-fund
     - if: github.ref_name == 'develop'
       run: serverless deploy --verbose --stage dev --region us-west-2
     - if: github.ref_name == 'main'
