@@ -1,3 +1,4 @@
-* @silinternational/developers
-*.tf @silinternational/tf-devs
+terraform/ @silinternational/tf-devs
 *.js @silinternational/js-devs
+*.mjs @silinternational/js-devs
+*.ts @silinternational/js-devs
