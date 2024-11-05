@@ -11,8 +11,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 jobs:
-  test_and_deploy:
-    name: Test and Deploy
+  test:
     runs-on: ubuntu-latest
     timeout-minutes: ${{ fromJSON(vars.DEFAULT_JOB_TIMEOUT_MINUTES) }}
     steps:
@@ -28,11 +27,25 @@ jobs:
         npm test
         serverless --version
         serverless info --conceal
+
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ fromJSON(vars.DEFAULT_JOB_TIMEOUT_MINUTES) }}
+    needs: test
+    strategy:
+      matrix:
+        region: [ us-east-1, us-west-2 ]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+    - name: install-serverless
+      run: npm install --no-fund -g serverless@3.25
+    - name: npm ci
+      run: npm ci --no-fund
     - if: github.ref_name == 'develop'
-      run: serverless deploy --verbose --stage dev --region us-east-1
-    - if: github.ref_name == 'develop'
-      run: serverless deploy --verbose --stage dev --region us-west-2
+      run: serverless deploy --verbose --stage dev --region ${{ matrix.region }}
     - if: github.ref_name == 'main'
-      run: serverless deploy --verbose --stage prod --region us-east-1
-    - if: github.ref_name == 'main'
-      run: serverless deploy --verbose --stage prod --region us-west-2
+      run: serverless deploy --verbose --stage prod --region ${{ matrix.region }}
