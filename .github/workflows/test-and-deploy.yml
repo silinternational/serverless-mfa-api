@@ -49,4 +49,3 @@ jobs:
       run: serverless deploy --verbose --stage dev --region ${{ matrix.region }}
     - if: github.ref_name == 'main'
       run: serverless deploy --verbose --stage prod --region ${{ matrix.region }}
-`
