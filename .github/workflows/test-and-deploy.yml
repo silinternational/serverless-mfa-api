@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     concurrency:
       group: test-${{ github.ref_name }}
-      cancel-in-progress: true
+      cancel-in-progress: false
     timeout-minutes: ${{ fromJSON(vars.DEFAULT_JOB_TIMEOUT_MINUTES) }}
     steps:
     - uses: actions/checkout@v4
